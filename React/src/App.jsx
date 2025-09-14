@@ -1,43 +1,20 @@
 import { useState } from 'react'
 import './App.css'
+import { useEvents } from './useEvents'
 
-const sampleEvents = [
-	{
-		id: 1,
-		title: 'Live Jazz Night',
-		date: '2025-09-12',
-		source: 'Eventbrite',
-		location: 'Downtown Club',
-	},
-	{
-		id: 2,
-		title: 'Art & Wine Festival',
-		date: '2025-09-15',
-		source: 'Meetup',
-		location: 'City Park',
-	},
-	{
-		id: 3,
-		title: 'Tech Innovators Meetup',
-		date: '2025-09-18',
-		source: 'Eventbrite',
-		location: 'Tech Hub',
-	},
-]
+// Ticketmaster events will be loaded from API
+
 
 function App() {
 	const [search, setSearch] = useState('')
-	const filteredEvents = sampleEvents.filter((e) =>
-		e.title.toLowerCase().includes(search.toLowerCase())
-	)
+	const { events, loading, error } = useEvents(search)
 
 	return (
 		<div className="wattado-container">
 			<header className="wattado-header">
 				<h1>Wattado</h1>
 				<p className="subtitle">
-					Find your next experience. Aggregated events & AI-powered
-					recommendations.
+					Find your next experience. Aggregated events & AI-powered recommendations.
 				</p>
 			</header>
 			<section className="search-section">
@@ -51,19 +28,26 @@ function App() {
 			</section>
 			<section className="events-section">
 				<h2>Upcoming Events</h2>
+				{loading && <div className="loading">Loading events...</div>}
+				{error && <div className="error">{error}</div>}
 				<ul className="event-list">
-					{filteredEvents.length === 0 ? (
+					{!loading && !error && events.length === 0 ? (
 						<li className="no-events">No events found.</li>
 					) : (
-						filteredEvents.map((event) => (
+						events.map((event) => (
 							<li key={event.id} className="event-card">
-								<div className="event-title">{event.title}</div>
+								<div className="event-title">{event.name}</div>
 								<div className="event-details">
 									<span>{event.date}</span> |{' '}
-									<span>{event.location}</span> |{' '}
-									<span className="event-source">
-										{event.source}
-									</span>
+									<span>{event.venue}</span> |{' '}
+									<a
+										href={event.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="event-source"
+									>
+										View on Ticketmaster
+									</a>
 								</div>
 							</li>
 						))
@@ -76,8 +60,7 @@ function App() {
 					<span role="img" aria-label="sparkles">
 						✨
 					</span>{' '}
-					Soon: Get personalized suggestions based on your interests and
-					mood!
+					Soon: Get personalized suggestions based on your interests and mood!
 				</div>
 			</section>
 		</div>
