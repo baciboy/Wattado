@@ -17,7 +17,7 @@ export const Header: React.FC<HeaderProps> = ({ onFilterToggle, totalEvents }) =
                 <Calendar className="w-6 h-6 text-white" />
               </div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                EventFinder
+                Wattado
               </h1>
             </div>
             <p className="text-gray-600">

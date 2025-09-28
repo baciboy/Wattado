@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Header } from './components/Header';
-import { EventCard } from './components/EventCard';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
 import { EventModal } from './components/EventModal';
-import { FilterSidebar } from './components/FilterSidebar';
-import { Event, FilterState } from './types/Event';
-import { Calendar, Loader2, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Event, TicketmasterEvent, TicketmasterResponse } from './types/Event';
 
 function App() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -13,9 +12,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
-  const ukCities = [
-    'London', 'Manchester', 'Birmingham', 'Liverpool', 'Leeds', 'Glasgow', 'Edinburgh', 'Bristol', 'Cardiff', 'Belfast', 'Newcastle', 'Sheffield', 'Nottingham', 'Southampton', 'Brighton'
-  ];
+    // Removed unused ukCities array
   const [city, setCity] = useState('');
   const [debouncedCity, setDebouncedCity] = useState('');
   const [date, setDate] = useState<Date | null>(null);
@@ -33,114 +30,78 @@ function App() {
 
   useEffect(() => {
     let isSubscribed = true;
-
     const fetchEvents = async () => {
       if (!isSubscribed) return;
       setLoading(true);
       setError(null);
-
       const baseUrl = new URL('https://app.ticketmaster.com/discovery/v2/events.json');
       baseUrl.searchParams.append('apikey', import.meta.env.VITE_TICKETMASTER_API_KEY);
-      baseUrl.searchParams.append('size', '100'); // Fetch more events
-      baseUrl.searchParams.append('countryCode', 'GB'); // Focus on UK events
-
-      if (debouncedCity) {
-        baseUrl.searchParams.append('city', debouncedCity.trim());
-      }
-
-      if (date) {
-        const isoDate = date.toISOString().split('T')[0] + 'T00:00:00Z';
-        baseUrl.searchParams.append('startDateTime', isoDate);
-      }
-
-      if (type) {
-        baseUrl.searchParams.append('classificationName', type);
-      }
-
+      baseUrl.searchParams.append('size', '100');
+      baseUrl.searchParams.append('countryCode', 'GB');
+      if (debouncedCity) baseUrl.searchParams.append('city', debouncedCity.trim());
+      if (date) baseUrl.searchParams.append('startDateTime', date.toISOString().split('T')[0] + 'T00:00:00Z');
+      if (type) baseUrl.searchParams.append('classificationName', type);
       try {
         const res = await fetch(baseUrl);
-        const data = await res.json();
-
+        const data: TicketmasterResponse = await res.json();
         if (!data._embedded?.events) {
-          if (isSubscribed) {
-            setEvents([]);
-            setError('No events found. Try a different search.');
-          }
+          setEvents([]);
+          setError('No events found. Try a different search.');
           return;
         }
-
-        const apiEvents = data._embedded.events.map((event: {
-          id: string;
-          name: string;
-          dates: { start: { localDate: string } };
-          _embedded?: { venues?: Array<{ name: string; city?: { name: string }; state?: { name: string }; address?: { line1: string } }> };
-          url: string;
-          classifications?: Array<{ segment?: { name: string } }>;
-          images?: Array<{ url: string }>;
-          priceRanges?: Array<{ min: number; max: number; currency: string }>;
-        }) => ({
+        const apiEvents: Event[] = data._embedded.events.map((event: TicketmasterEvent) => ({
           id: event.id,
           title: event.name || 'Untitled Event',
-          description: event.description || '',
+          description: '',
           date: event.dates?.start?.localDate || '',
           time: event.dates?.start?.localTime || '',
-          source: 'Ticketmaster',
           location: {
             venue: event._embedded?.venues?.[0]?.name || 'Unknown',
             city: event._embedded?.venues?.[0]?.city?.name || 'Unknown',
             state: event._embedded?.venues?.[0]?.state?.name || '',
-            address: event._embedded?.venues?.[0]?.address?.line1 || ''
+            address: event._embedded?.venues?.[0]?.address?.line1 || '',
+            coordinates: event._embedded?.venues?.[0]?.location ? {
+              latitude: Number(event._embedded.venues[0].location.latitude),
+              longitude: Number(event._embedded.venues[0].location.longitude)
+            } : undefined
           },
-          url: event.url || '',
+          price: event.priceRanges && event.priceRanges.length > 0 ? {
+            min: event.priceRanges[0].min,
+            max: event.priceRanges[0].max,
+            currency: event.priceRanges[0].currency
+          } : { min: 0, max: 0, currency: 'GBP' },
           category: event.classifications?.[0]?.segment?.name || '',
           platform: 'ticketmaster',
           image: event.images?.[0]?.url || 'https://via.placeholder.com/400',
-          price: (() => {
-            if (event.priceRanges && event.priceRanges.length > 0) {
-              const pr = event.priceRanges[0];
-              return {
-                min: typeof pr.min === 'number' ? pr.min : 0,
-                max: typeof pr.max === 'number' ? pr.max : 0,
-                currency: pr.currency || 'GBP'
-              };
-            }
-            return { min: 0, max: 0, currency: 'GBP' };
-          })(),
-          availability: 'available'
+          url: event.url || '',
+          availability: 'available',
+          rating: undefined,
+          attendees: undefined,
+          ticketmasterId: event.id,
+          genre: event.classifications?.[0]?.genre?.name,
+          subGenre: event.classifications?.[0]?.subGenre?.name,
+          promoter: event.promoter?.name
         }));
-
-        if (isSubscribed) {
-          setEvents(apiEvents);
-          setError(null);
-        }
-      } catch (error) {
-        if (!isSubscribed) return;
-        console.error('Error fetching events:', error);
-        setError('Failed to fetch events. Please try a different search.');
+        setEvents(apiEvents);
+      } catch {
+        setError('Failed to fetch events. Please try again later.');
       } finally {
-        if (isSubscribed) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
-
     fetchEvents();
-    
-    return () => {
-      isSubscribed = false;
-    };
+    return () => { isSubscribed = false; };
   }, [debouncedCity, date, type]);
 
-  const filteredEvents = events.filter((e) =>
-    search 
-      ? e.title.toLowerCase().includes(search.toLowerCase())
+  const filteredEvents: Event[] = events.filter((e: Event) =>
+    search
+      ? typeof e.title === 'string' && e.title.toLowerCase().includes(search.toLowerCase())
       : true
   );
 
   const handleEventClick = (event: Event) => {
-  console.log('Event clicked:', event);
-  setSelectedEvent(event);
-  setIsModalOpen(true);
+    setSelectedEvent(event);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
@@ -153,9 +114,7 @@ function App() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Events</h2>
-          <p className="text-gray-600">Fetching the latest events from Ticketmaster...</p>
+          <span className="text-xl text-purple-600">Loading...</span>
         </div>
       </div>
     );
@@ -166,8 +125,6 @@ function App() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Unable to Load Events</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -181,78 +138,35 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header 
-        onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
-        totalEvents={filteredEvents.length}
-      />
-      <div className="max-w-7xl mx-auto flex">
-        <FilterSidebar
-          filters={{
-            search,
-            dateRange: { 
-              start: date ? date.toISOString().split('T')[0] : '',
-              end: ''
-            },
-            location: city,
-            categories: type ? [type] : [],
-            priceRange: { min: 0, max: 1000 },
-            platforms: ['ticketmaster'],
-            availability: []
-          }}
-          onFiltersChange={(newFilters: FilterState) => {
-            setSearch(newFilters.search);
-            setCity(newFilters.location);
-            setDate(newFilters.dateRange.start ? new Date(newFilters.dateRange.start) : null);
-            setType(newFilters.categories[0] || '');
-          }}
-          isOpen={isFilterOpen}
-          onClose={() => setIsFilterOpen(false)}
-          eventCount={filteredEvents.length}
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              filteredEvents={filteredEvents}
+              isFilterOpen={isFilterOpen}
+              setIsFilterOpen={setIsFilterOpen}
+              search={search}
+              setSearch={setSearch}
+              city={city}
+              setCity={setCity}
+              date={date}
+              setDate={setDate}
+              type={type}
+              setType={setType}
+              handleEventClick={handleEventClick}
+            />
+          }
         />
-
-        <div className="flex-1 p-6">
-          {filteredEvents.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No events found</h3>
-              <p className="text-gray-600 mb-4">
-                Try adjusting your search or filters to find more events.
-              </p>
-              <button
-                onClick={() => {
-                  setSearch('');
-                  setCity('');
-                  setDate(null);
-                  setType('');
-                }}
-                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                Clear All Filters
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredEvents.map(event => (
-                <EventCard
-                  key={event.id}
-                  event={event}
-                  onEventClick={handleEventClick}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
       <EventModal
         event={selectedEvent}
         isOpen={isModalOpen}
         onClose={closeModal}
       />
-    </div>
+    </Router>
   );
 }
 
