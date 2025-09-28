@@ -37,6 +37,13 @@ const availabilityText = {
 
 export const EventCard: React.FC<EventCardProps> = ({ event, onEventClick }) => {
   const formatDate = (dateString: string) => {
+    // If dateString is a range, format both dates
+    if (dateString.includes(' - ')) {
+      const [start, end] = dateString.split(' - ');
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      return `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    }
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
       weekday: 'short',
@@ -46,9 +53,9 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onEventClick }) => 
   };
 
   const formatPrice = (min: number, max: number, currency: string) => {
-  if (min === 0 && max === 0) return 'Free';
-  if (min === max) return `${currency} ${min}`;
-  return `${currency} ${min} - ${max}`;
+    if ((min === 0 && max === 0) || (min === Number.POSITIVE_INFINITY && max === 0)) return 'Free';
+    if (min === max) return `${currency} ${min}`;
+    return `${currency} ${min} - ${max}`;
   };
 
   return (
@@ -98,7 +105,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onEventClick }) => 
         <div className="space-y-2 mb-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Calendar className="w-4 h-4 text-purple-500" />
-            <span>{formatDate(event.date)} at {event.time}</span>
+            <span>{formatDate(event.date)}{event.time ? ` at ${event.time}` : ''}</span>
           </div>
           
           <div className="flex items-center gap-2 text-sm text-gray-600">
