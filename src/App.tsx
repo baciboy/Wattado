@@ -36,7 +36,7 @@ function App() {
       setError(null);
       const baseUrl = new URL('https://app.ticketmaster.com/discovery/v2/events.json');
       baseUrl.searchParams.append('apikey', import.meta.env.VITE_TICKETMASTER_API_KEY);
-      baseUrl.searchParams.append('size', '100');
+  baseUrl.searchParams.append('size', '200');
       baseUrl.searchParams.append('countryCode', 'GB');
       if (debouncedCity) baseUrl.searchParams.append('city', debouncedCity.trim());
       if (date) baseUrl.searchParams.append('startDateTime', date.toISOString().split('T')[0] + 'T00:00:00Z');

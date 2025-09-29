@@ -69,7 +69,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       {/* Sidebar */}
       <div className={`
         fixed lg:sticky top-0 left-0 h-screen bg-white border-r border-gray-200 z-50 
-        transform transition-transform duration-300 ease-in-out w-80
+  transform transition-transform duration-300 ease-in-out w-[32rem]
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         overflow-y-auto
       `}>
@@ -110,29 +110,36 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             />
           </div>
 
-          {/* Date Range */}
+          {/* Date Range - Original layout with improved calendar icon */}
           <div className="mb-6">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
               <Calendar className="w-4 h-4" />
               Date Range
             </label>
             <div className="grid grid-cols-2 gap-2">
-              <input
-                type="date"
-                value={filters.dateRange.start}
-                onChange={(e) => updateFilters({ 
-                  dateRange: { ...filters.dateRange, start: e.target.value }
-                })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-              />
-              <input
-                type="date"
-                value={filters.dateRange.end}
-                onChange={(e) => updateFilters({ 
-                  dateRange: { ...filters.dateRange, end: e.target.value }
-                })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-              />
+              <div className="relative">
+                <input
+                  type="date"
+                  value={filters.dateRange.start}
+                  onChange={(e) => updateFilters({ 
+                    dateRange: { ...filters.dateRange, start: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm pr-10"
+                />
+                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <Calendar className="w-4 h-4 text-purple-400" />
+                </span>
+              </div>
+              <div>
+                <input
+                  type="date"
+                  value={filters.dateRange.end}
+                  onChange={(e) => updateFilters({ 
+                    dateRange: { ...filters.dateRange, end: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm pr-10"
+                />
+              </div>
             </div>
           </div>
 
