@@ -28,6 +28,14 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
   if (!isOpen || !event) return null;
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    // Handle date range
+    if (dateString.includes(' - ')) {
+      const [start, end] = dateString.split(' - ');
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      return `${startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+    }
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
       weekday: 'long',
@@ -38,9 +46,9 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
   };
 
   const formatPrice = (min: number, max: number, currency: string) => {
-    if (min === 0) return 'Free';
-    if (min === max) return `$${min}`;
-    return `$${min} - $${max}`;
+    if (min === 0 && max === 0) return 'Free';
+    if (min === max) return `${currency} ${min}`;
+    return `${currency} ${min} - ${max}`;
   };
 
   return (
