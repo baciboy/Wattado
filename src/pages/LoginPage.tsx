@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Facebook, Mail, Phone, User } from "lucide-react";
+import { Facebook, Mail, Phone } from "lucide-react";
 
 export const LoginPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<"email" | "phone">("email");
