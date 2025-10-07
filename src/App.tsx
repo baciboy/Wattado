@@ -34,15 +34,22 @@ function App() {
       if (!isSubscribed) return;
       setLoading(true);
       setError(null);
-      const baseUrl = new URL('https://app.ticketmaster.com/discovery/v2/events.json');
-      baseUrl.searchParams.append('apikey', import.meta.env.VITE_TICKETMASTER_API_KEY);
-  baseUrl.searchParams.append('size', '200');
+      // Use Vercel proxy in production to keep API key server-side; direct API in dev
+      const useProxy = import.meta.env.PROD;
+      const baseUrl = useProxy
+        ? new URL('/api/ticketmaster/events', window.location.origin)
+        : new URL('https://app.ticketmaster.com/discovery/v2/events.json');
+      // Only append API key from client in dev mode
+      if (!useProxy) {
+        baseUrl.searchParams.append('apikey', import.meta.env.VITE_TICKETMASTER_API_KEY);
+      }
+      baseUrl.searchParams.append('size', '200');
       baseUrl.searchParams.append('countryCode', 'GB');
       if (debouncedCity) baseUrl.searchParams.append('city', debouncedCity.trim());
       if (date) baseUrl.searchParams.append('startDateTime', date.toISOString().split('T')[0] + 'T00:00:00Z');
       if (type) baseUrl.searchParams.append('classificationName', type);
       try {
-        const res = await fetch(baseUrl);
+        const res = await fetch(baseUrl.toString());
         const data: TicketmasterResponse = await res.json();
         if (!data._embedded?.events) {
           setEvents([]);
