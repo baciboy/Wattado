@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Filter, Calendar, TrendingUp, User } from 'lucide-react';
+import { UserMenu } from './header/UserMenu';
 
 interface HeaderProps {
   onFilterToggle: () => void;
@@ -62,31 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ onFilterToggle, totalEvents }) =
               <span>Filters</span>
             </button>
 
-            {/* User Icon and Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setDropdownOpen((open) => !open)}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-purple-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                aria-label="User menu"
-              >
-                <User className="w-6 h-6 text-purple-700" />
-              </button>
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
-                  <ul className="py-2">
-                    <li>
-                      <button className="w-full text-left px-4 py-2 hover:bg-purple-50 text-gray-700 font-medium">Profile</button>
-                    </li>
-                    <li>
-                      <button className="w-full text-left px-4 py-2 hover:bg-purple-50 text-gray-700 font-medium">Favourites</button>
-                    </li>
-                    <li>
-                      <button className="w-full text-left px-4 py-2 hover:bg-purple-50 text-gray-700 font-medium">Settings</button>
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
+            <UserMenu />
           </div>
         </div>
       </div>
