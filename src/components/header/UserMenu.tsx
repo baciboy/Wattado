@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { supabase } from '../../services/supabaseClient';
 
 export const UserMenu: React.FC = () => {
   const { user, isLoading } = useAuth();
@@ -23,13 +24,17 @@ export const UserMenu: React.FC = () => {
 
   const name = user.user_metadata?.name || user.email || 'Account';
   return (
-    <a
-      href="#"
-      className="px-4 py-2 rounded-xl bg-gray-100 text-gray-800 hover:bg-purple-100 transition-colors"
-      aria-label="User menu"
-    >
-      {name}
-    </a>
+    <div className="flex items-center gap-2">
+      <span className="px-4 py-2 rounded-xl bg-gray-100 text-gray-800" aria-label="User">
+        {name}
+      </span>
+      <button
+        onClick={() => supabase.auth.signOut().then(() => { window.location.reload(); })}
+        className="px-3 py-2 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors"
+      >
+        Logout
+      </button>
+    </div>
   );
 };
 

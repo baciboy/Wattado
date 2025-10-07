@@ -1,12 +1,31 @@
 import React, { useState } from "react";
-import { Facebook, Mail, Phone, User } from "lucide-react";
+import { Facebook, Mail, Phone } from "lucide-react";
+import { supabase } from "../services/supabaseClient";
 
 export const LoginPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<"email" | "phone">("email");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    window.location.href = '/';
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (signInError) {
+        setError(signInError.message);
+        return;
+      }
+      window.location.href = "/";
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-purple-100">
@@ -45,6 +64,8 @@ export const LoginPage: React.FC = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="you@email.com"
                 autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
@@ -54,17 +75,23 @@ export const LoginPage: React.FC = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="••••••••"
                 autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            {error && (
+              <p className="text-sm text-red-600">{error}</p>
+            )}
             <button
               type="submit"
-              className="w-full py-2 mt-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
+              disabled={isSubmitting}
+              className="w-full py-2 mt-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition disabled:opacity-50"
             >
-              Login
+              {isSubmitting ? "Signing in…" : "Login"}
             </button>
           </form>
         ) : (
-          <form className="space-y-4" onSubmit={handleLogin}>
+          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
               <div className="flex">
@@ -84,9 +111,10 @@ export const LoginPage: React.FC = () => {
             </div>
             <button
               type="submit"
-              className="w-full py-2 mt-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
+              className="w-full py-2 mt-2 bg-purple-600 text-white rounded-lg font-semibold opacity-70 cursor-not-allowed"
+              title="Phone login to be added later"
             >
-              Login
+              Login (coming soon)
             </button>
           </form>
         )}
