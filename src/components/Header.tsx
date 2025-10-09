@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Filter, Calendar, TrendingUp, User } from 'lucide-react';
+import React from 'react';
+import { Filter, Calendar, TrendingUp } from 'lucide-react';
 import { UserMenu } from './header/UserMenu';
 
 interface HeaderProps {
@@ -8,25 +8,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onFilterToggle, totalEvents }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [dropdownOpen]);
 
   return (
     <div className="bg-white border-b border-gray-200">

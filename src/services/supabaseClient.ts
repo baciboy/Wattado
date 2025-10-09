@@ -14,6 +14,17 @@ const supabaseAnonKey = (
   import.meta.env.VITE_SUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY
 ) as string | undefined;
 
+// Validate environment variables in development
+if (import.meta.env.DEV) {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn(
+      'Supabase environment variables are not configured. ' +
+      'Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file. ' +
+      'Authentication features will not work until these are configured.'
+    );
+  }
+}
+
 // Create a singleton Supabase client. If envs are missing, we still export a client
 // with empty strings so the app does not crash in non-auth scenarios; operations
 // will fail until envs are configured.

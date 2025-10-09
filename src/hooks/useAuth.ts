@@ -6,27 +6,59 @@ interface AuthState {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
+  error: Error | null;
 }
 
 export function useAuth(): AuthState {
-  const [state, setState] = useState<AuthState>({ user: null, session: null, isLoading: true });
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    session: null,
+    isLoading: true,
+    error: null
+  });
 
   useEffect(() => {
     let isMounted = true;
 
     const bootstrap = async () => {
-      const {
-        data: { session }
-      } = await supabase.auth.getSession();
-      if (!isMounted) return;
-      setState({ user: session?.user ?? null, session: session ?? null, isLoading: false });
+      try {
+        const {
+          data: { session },
+          error
+        } = await supabase.auth.getSession();
+
+        if (!isMounted) return;
+
+        if (error) {
+          setState({ user: null, session: null, isLoading: false, error });
+          console.error('Error getting session:', error);
+          return;
+        }
+
+        setState({
+          user: session?.user ?? null,
+          session: session ?? null,
+          isLoading: false,
+          error: null
+        });
+      } catch (err) {
+        if (!isMounted) return;
+        const error = err instanceof Error ? err : new Error('Unknown error during auth initialization');
+        setState({ user: null, session: null, isLoading: false, error });
+        console.error('Error bootstrapping auth:', error);
+      }
     };
 
     bootstrap();
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
-      setState({ user: session?.user ?? null, session: session ?? null, isLoading: false });
+      setState({
+        user: session?.user ?? null,
+        session: session ?? null,
+        isLoading: false,
+        error: null
+      });
     });
 
     return () => {

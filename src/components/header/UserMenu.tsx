@@ -1,9 +1,16 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../services/supabaseClient';
 
 export const UserMenu: React.FC = () => {
+  const navigate = useNavigate();
   const { user, isLoading } = useAuth();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
 
   if (isLoading) {
     return (
@@ -13,12 +20,12 @@ export const UserMenu: React.FC = () => {
 
   if (!user) {
     return (
-      <a
-        href="/login"
+      <Link
+        to="/login"
         className="px-4 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-colors"
       >
         Log in
-      </a>
+      </Link>
     );
   }
 
@@ -29,7 +36,7 @@ export const UserMenu: React.FC = () => {
         {name}
       </span>
       <button
-        onClick={() => supabase.auth.signOut().then(() => { window.location.reload(); })}
+        onClick={handleLogout}
         className="px-3 py-2 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors"
       >
         Logout

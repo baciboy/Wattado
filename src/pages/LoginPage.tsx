@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Facebook, Mail, Phone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabaseClient";
 
 export const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +24,7 @@ export const LoginPage: React.FC = () => {
         setError(signInError.message);
         return;
       }
-      window.location.href = "/";
+      navigate("/");
     } finally {
       setIsSubmitting(false);
     }

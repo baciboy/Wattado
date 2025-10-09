@@ -4,7 +4,7 @@ import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
 import { EventModal } from './components/EventModal';
 import { useState, useEffect } from 'react';
-import { Event, TicketmasterEvent, TicketmasterResponse } from './types/Event';
+import { Event, TicketmasterEvent, TicketmasterResponse, FilterState } from './types/Event';
 
 function App() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -13,21 +13,28 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
-    // Removed unused ukCities array
-  const [city, setCity] = useState('');
+
+  // Consolidated filter state
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    dateRange: { start: '', end: '' },
+    location: '',
+    categories: [],
+    priceRange: { min: 0, max: 1000 },
+    platforms: [],
+    availability: []
+  });
+
   const [debouncedCity, setDebouncedCity] = useState('');
-  const [date, setDate] = useState<Date | null>(null);
-  const [type, setType] = useState('');
-  const [search, setSearch] = useState('');
 
   // Set up debounced city update
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedCity(city);
+      setDebouncedCity(filters.location);
     }, 500); // 500ms delay
 
     return () => clearTimeout(timer);
-  }, [city]);
+  }, [filters.location]);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -40,8 +47,14 @@ function App() {
   baseUrl.searchParams.append('size', '200');
       baseUrl.searchParams.append('countryCode', 'GB');
       if (debouncedCity) baseUrl.searchParams.append('city', debouncedCity.trim());
-      if (date) baseUrl.searchParams.append('startDateTime', date.toISOString().split('T')[0] + 'T00:00:00Z');
-      if (type) baseUrl.searchParams.append('classificationName', type);
+      // Use start date from date range if available
+      if (filters.dateRange.start) {
+        baseUrl.searchParams.append('startDateTime', filters.dateRange.start + 'T00:00:00Z');
+      }
+      // Use first category for API call (Ticketmaster limitation)
+      if (filters.categories.length > 0) {
+        baseUrl.searchParams.append('classificationName', filters.categories[0]);
+      }
       try {
         const res = await fetch(baseUrl);
         const data: TicketmasterResponse = await res.json();
@@ -179,13 +192,62 @@ function App() {
     };
     fetchEvents();
     return () => { isSubscribed = false; };
-  }, [debouncedCity, date, type]);
+  }, [debouncedCity, filters.dateRange.start, filters.categories]);
 
-  const filteredEvents: Event[] = events.filter((e: Event) =>
-    search
-      ? typeof e.title === 'string' && e.title.toLowerCase().includes(search.toLowerCase())
-      : true
-  );
+  // Client-side filtering for all other filters
+  const filteredEvents: Event[] = events.filter((event: Event) => {
+    // Search filter (title, venue, description)
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      const matchesTitle = event.title?.toLowerCase().includes(searchLower);
+      const matchesVenue = event.location?.venue?.toLowerCase().includes(searchLower);
+      const matchesDescription = event.description?.toLowerCase().includes(searchLower);
+      if (!matchesTitle && !matchesVenue && !matchesDescription) {
+        return false;
+      }
+    }
+
+    // Date range filter (end date)
+    if (filters.dateRange.end) {
+      const eventDate = event.date.includes(' - ')
+        ? event.date.split(' - ')[0] // Use first date if it's a range
+        : event.date;
+      if (eventDate > filters.dateRange.end) {
+        return false;
+      }
+    }
+
+    // Price range filter
+    if (filters.priceRange.min > 0 && event.price.max < filters.priceRange.min) {
+      return false;
+    }
+    if (filters.priceRange.max < 1000 && event.price.min > filters.priceRange.max) {
+      return false;
+    }
+
+    // Platform filter (when we have multiple platforms)
+    if (filters.platforms.length > 0 && !filters.platforms.includes(event.platform)) {
+      return false;
+    }
+
+    // Availability filter
+    if (filters.availability.length > 0 && !filters.availability.includes(event.availability)) {
+      return false;
+    }
+
+    // Categories filter (for additional categories beyond API filter)
+    if (filters.categories.length > 1) {
+      // Check if event matches any of the selected categories
+      const matchesCategory = filters.categories.some(cat =>
+        event.category?.toLowerCase().includes(cat.toLowerCase())
+      );
+      if (!matchesCategory) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -235,14 +297,8 @@ function App() {
               filteredEvents={filteredEvents}
               isFilterOpen={isFilterOpen}
               setIsFilterOpen={setIsFilterOpen}
-              search={search}
-              setSearch={setSearch}
-              city={city}
-              setCity={setCity}
-              date={date}
-              setDate={setDate}
-              type={type}
-              setType={setType}
+              filters={filters}
+              onFiltersChange={setFilters}
               handleEventClick={handleEventClick}
             />
           }

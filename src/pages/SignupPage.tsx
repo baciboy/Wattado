@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Mail, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
 
 const SignupPage: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -26,7 +27,7 @@ const SignupPage: React.FC = () => {
         setError(signUpError.message);
         return;
       }
-      window.location.href = '/';
+      navigate('/');
     } finally {
       setIsSubmitting(false);
     }

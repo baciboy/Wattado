@@ -21,8 +21,13 @@ class TicketmasterService {
   constructor() {
     this.apiKey = API_KEY;
 
-    if (!this.apiKey) {
-      console.warn('Ticketmaster API key not found. Please add VITE_TICKETMASTER_API_KEY to your .env file');
+    // Validate API key in development
+    if (import.meta.env.DEV && !this.apiKey) {
+      console.error(
+        'Ticketmaster API key is not configured. ' +
+        'Please add VITE_TICKETMASTER_API_KEY to your .env file. ' +
+        'Event fetching will not work until this is configured.'
+      );
     }
   }
 
