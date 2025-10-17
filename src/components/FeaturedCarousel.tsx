@@ -93,10 +93,10 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
   return (
     <div className="relative w-full mb-16">
       {/* 3D Carousel Container */}
-      <div className="relative h-[600px] md:h-[650px] flex items-center justify-center px-4 md:px-8">
+      <div className="relative h-[450px] md:h-[500px] flex items-center justify-center px-4 md:px-8">
         {/* Left Card */}
         <div
-          className="absolute left-4 md:left-16 top-32 md:top-40 w-[280px] md:w-[340px] cursor-pointer transform scale-75 md:scale-80 opacity-50 hover:opacity-70 transition-all duration-500 z-10"
+          className="absolute left-0 md:left-8 top-1/2 -translate-y-1/2 w-[320px] md:w-[450px] cursor-pointer transform scale-75 md:scale-85 opacity-40 hover:opacity-60 transition-all duration-500 z-10"
           onClick={goToPrevious}
         >
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
@@ -104,7 +104,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
               <img
                 src={leftEvent.image}
                 alt={leftEvent.title}
-                className="w-full h-56 md:h-64 object-cover"
+                className="w-full h-40 md:h-48 object-cover"
               />
               <div className="absolute top-3 left-3">
                 <span className={`${platformColors[leftEvent.platform]} text-white text-xs font-semibold px-2 py-1 rounded-full`}>
@@ -112,20 +112,16 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
                 </span>
               </div>
             </div>
-            <div className="p-4">
+            <div className="p-3 md:p-4">
               <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded-full">
                 {leftEvent.category}
               </span>
-              <h3 className="font-bold text-lg text-gray-900 mt-2 line-clamp-2">
+              <h3 className="font-bold text-base md:text-lg text-gray-900 mt-2 line-clamp-1">
                 {leftEvent.title}
               </h3>
-              <div className="flex items-center gap-2 text-sm text-gray-600 mt-3">
-                <Calendar className="w-4 h-4 text-blue-600" />
+              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 mt-2">
+                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                 <span>{formatDate(leftEvent.date)}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
-                <MapPin className="w-4 h-4 text-blue-600" />
-                <span className="line-clamp-1">{leftEvent.location.city}</span>
               </div>
             </div>
           </div>
@@ -133,7 +129,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
 
         {/* Center Card (Main) */}
         <div
-          className="relative w-[360px] md:w-[500px] cursor-pointer transform scale-100 z-30 hover:scale-[1.02] transition-all duration-500"
+          className="relative w-[380px] md:w-[650px] cursor-pointer transform scale-100 z-30 hover:scale-[1.02] transition-all duration-500"
           onClick={() => onEventClick(centerEvent)}
         >
           <div className="bg-white rounded-3xl shadow-[0_25px_80px_-20px_rgba(0,0,0,0.4)] overflow-hidden hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.5)] transition-all duration-300">
@@ -141,7 +137,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
               <img
                 src={centerEvent.image}
                 alt={centerEvent.title}
-                className="w-full h-80 md:h-96 object-cover"
+                className="w-full h-52 md:h-72 object-cover"
               />
               <div className="absolute top-4 left-4">
                 <span className={`${platformColors[centerEvent.platform]} text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg`}>
@@ -150,20 +146,20 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
               </div>
               {centerEvent.rating && (
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                  <Star className="w-5 h-5 text-yellow-400 fill-current" />
                   <span className="text-sm font-bold text-gray-900">{centerEvent.rating}</span>
                 </div>
               )}
             </div>
 
-            <div className="p-6 md:p-7">
+            <div className="p-5 md:p-6">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-semibold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full">
                   {centerEvent.category}
                 </span>
               </div>
 
-              <h3 className="font-bold text-2xl md:text-3xl text-gray-900 mb-3 leading-tight line-clamp-2">
+              <h3 className="font-bold text-xl md:text-2xl text-gray-900 mb-2 leading-tight line-clamp-2">
                 {centerEvent.title}
               </h3>
 
@@ -171,27 +167,27 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
                 {centerEvent.description}
               </p>
 
-              <div className="space-y-2.5 mb-5">
+              <div className="space-y-2 mb-4">
                 <div className="flex items-center gap-2 text-sm md:text-base text-gray-700">
-                  <Calendar className="w-5 h-5 text-blue-600" />
+                  <Calendar className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                   <span className="font-medium">{formatDate(centerEvent.date)}{centerEvent.time ? ` at ${centerEvent.time}` : ''}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm md:text-base text-gray-700">
-                  <MapPin className="w-5 h-5 text-blue-600" />
+                  <MapPin className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                   <span className="font-medium line-clamp-1">{centerEvent.location.venue}, {centerEvent.location.city}</span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-5 border-t border-gray-100">
-                <div className="text-2xl md:text-3xl font-bold text-gray-900">
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div className="text-xl md:text-2xl font-bold text-gray-900">
                   {centerEvent.price
                     ? formatPrice(centerEvent.price.min, centerEvent.price.max, centerEvent.price.currency)
                     : 'Free'}
                 </div>
                 <div className="flex items-center gap-2 text-blue-700 font-semibold text-sm md:text-base">
                   <span>View Details</span>
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="w-5 h-5" />
                 </div>
               </div>
             </div>
@@ -200,7 +196,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
 
         {/* Right Card */}
         <div
-          className="absolute right-4 md:right-16 top-32 md:top-40 w-[280px] md:w-[340px] cursor-pointer transform scale-75 md:scale-80 opacity-50 hover:opacity-70 transition-all duration-500 z-10"
+          className="absolute right-0 md:right-8 top-1/2 -translate-y-1/2 w-[320px] md:w-[450px] cursor-pointer transform scale-75 md:scale-85 opacity-40 hover:opacity-60 transition-all duration-500 z-10"
           onClick={goToNext}
         >
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
@@ -208,7 +204,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
               <img
                 src={rightEvent.image}
                 alt={rightEvent.title}
-                className="w-full h-56 md:h-64 object-cover"
+                className="w-full h-40 md:h-48 object-cover"
               />
               <div className="absolute top-3 left-3">
                 <span className={`${platformColors[rightEvent.platform]} text-white text-xs font-semibold px-2 py-1 rounded-full`}>
@@ -216,20 +212,16 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
                 </span>
               </div>
             </div>
-            <div className="p-4">
+            <div className="p-3 md:p-4">
               <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded-full">
                 {rightEvent.category}
               </span>
-              <h3 className="font-bold text-lg text-gray-900 mt-2 line-clamp-2">
+              <h3 className="font-bold text-base md:text-lg text-gray-900 mt-2 line-clamp-1">
                 {rightEvent.title}
               </h3>
-              <div className="flex items-center gap-2 text-sm text-gray-600 mt-3">
-                <Calendar className="w-4 h-4 text-blue-600" />
+              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 mt-2">
+                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                 <span>{formatDate(rightEvent.date)}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
-                <MapPin className="w-4 h-4 text-blue-600" />
-                <span className="line-clamp-1">{rightEvent.location.city}</span>
               </div>
             </div>
           </div>
@@ -243,14 +235,14 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
               className="absolute left-0 md:-left-4 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-white hover:bg-blue-50 text-blue-700 rounded-full transition-all shadow-lg hover:shadow-xl z-30 hover:scale-110"
               aria-label="Previous event"
             >
-              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+              <ChevronLeft className="w-6 h-6 md:w-7 md:h-7" />
             </button>
             <button
               onClick={goToNext}
               className="absolute right-0 md:-right-4 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-white hover:bg-blue-50 text-blue-700 rounded-full transition-all shadow-lg hover:shadow-xl z-30 hover:scale-110"
               aria-label="Next event"
             >
-              <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+              <ChevronRight className="w-6 h-6 md:w-7 md:h-7" />
             </button>
           </>
         )}
@@ -273,6 +265,62 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
           ))}
         </div>
       )}
+
+      {/* We Think You'd Like Section */}
+      <div className="mt-16 px-4 md:px-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">We think you'd like</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {events.slice(6, 10).map((event) => (
+            <div
+              key={event.id}
+              onClick={() => onEventClick(event)}
+              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
+            >
+              <div className="relative">
+                <img
+                  src={event.image}
+                  alt={event.title}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute top-3 left-3">
+                  <span className={`${platformColors[event.platform]} text-white text-xs font-semibold px-2 py-1 rounded-full`}>
+                    {platformNames[event.platform]}
+                  </span>
+                </div>
+                {event.rating && (
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    <span className="text-sm font-bold text-gray-900">{event.rating}</span>
+                  </div>
+                )}
+              </div>
+              <div className="p-4">
+                <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded-full">
+                  {event.category}
+                </span>
+                <h3 className="font-bold text-base text-gray-900 mt-2 line-clamp-2">
+                  {event.title}
+                </h3>
+                <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
+                  <Calendar className="w-4 h-4 text-blue-600" />
+                  <span>{formatDate(event.date)}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                  <MapPin className="w-4 h-4 text-blue-600" />
+                  <span className="line-clamp-1">{event.location.city}</span>
+                </div>
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="text-lg font-bold text-gray-900">
+                    {event.price
+                      ? formatPrice(event.price.min, event.price.max, event.price.currency)
+                      : 'Free'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
