@@ -22,7 +22,7 @@ export const UserMenu: React.FC = () => {
     return (
       <Link
         to="/login"
-        className="px-4 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+        className="px-4 py-2 rounded-xl bg-blue-700 text-white hover:bg-blue-800 transition-colors"
       >
         Log in
       </Link>
@@ -37,7 +37,7 @@ export const UserMenu: React.FC = () => {
       </span>
       <button
         onClick={handleLogout}
-        className="px-3 py-2 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors"
+        className="px-3 py-2 rounded-xl bg-blue-50 text-blue-800 hover:bg-blue-100 transition-colors"
       >
         Logout
       </button>

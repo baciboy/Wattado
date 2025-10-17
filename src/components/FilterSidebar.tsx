@@ -130,8 +130,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-200">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Filter className="w-4 h-4 text-purple-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Filter className="w-4 h-4 text-blue-700" />
               </div>
               <div>
                 <h2 className="text-base font-bold text-gray-900">Filters</h2>
@@ -159,7 +159,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 value={filters.search}
                 onChange={(e) => updateFilters({ search: e.target.value })}
                 placeholder="Search by name or venue..."
-                className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
+                className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
               />
             </div>
           </div>
@@ -174,25 +174,25 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             <div className="flex flex-wrap gap-1.5 mb-3">
               <button
                 onClick={() => setDatePreset('today')}
-                className="px-2.5 py-1 text-xs font-medium bg-white border border-gray-200 rounded-md hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 transition-colors"
+                className="px-2.5 py-1 text-xs font-medium bg-white border border-gray-200 rounded-md hover:bg-blue-50 hover:border-blue-300 hover:text-blue-800 transition-colors"
               >
                 Today
               </button>
               <button
                 onClick={() => setDatePreset('tomorrow')}
-                className="px-2.5 py-1 text-xs font-medium bg-white border border-gray-200 rounded-md hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 transition-colors"
+                className="px-2.5 py-1 text-xs font-medium bg-white border border-gray-200 rounded-md hover:bg-blue-50 hover:border-blue-300 hover:text-blue-800 transition-colors"
               >
                 Tomorrow
               </button>
               <button
                 onClick={() => setDatePreset('this-weekend')}
-                className="px-2.5 py-1 text-xs font-medium bg-white border border-gray-200 rounded-md hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 transition-colors"
+                className="px-2.5 py-1 text-xs font-medium bg-white border border-gray-200 rounded-md hover:bg-blue-50 hover:border-blue-300 hover:text-blue-800 transition-colors"
               >
                 Weekend
               </button>
               <button
                 onClick={() => setDatePreset('this-week')}
-                className="px-2.5 py-1 text-xs font-medium bg-white border border-gray-200 rounded-md hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 transition-colors"
+                className="px-2.5 py-1 text-xs font-medium bg-white border border-gray-200 rounded-md hover:bg-blue-50 hover:border-blue-300 hover:text-blue-800 transition-colors"
               >
                 This Week
               </button>
@@ -208,7 +208,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                   onChange={(e) => updateFilters({
                     dateRange: { ...filters.dateRange, start: e.target.value }
                   })}
-                  className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
+                  className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
                   placeholder="Start date"
                 />
               </div>
@@ -220,7 +220,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                   onChange={(e) => updateFilters({
                     dateRange: { ...filters.dateRange, end: e.target.value }
                   })}
-                  className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
+                  className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
                   placeholder="End date"
                 />
               </div>
@@ -237,7 +237,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               <select
                 value={filters.location}
                 onChange={(e) => updateFilters({ location: e.target.value })}
-                className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm appearance-none cursor-pointer"
+                className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm appearance-none cursor-pointer"
               >
                 <option value="">All cities</option>
                 {ukCities.map(city => (
@@ -263,7 +263,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     priceRange: { ...filters.priceRange, min: Number(e.target.value) || 0 }
                   })}
                   placeholder="Min"
-                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
+                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
                 />
               </div>
               <div className="relative">
@@ -275,7 +275,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                     priceRange: { ...filters.priceRange, max: Number(e.target.value) || 1000 }
                   })}
                   placeholder="Max"
-                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
+                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-shadow hover:shadow-sm"
                 />
               </div>
             </div>
@@ -285,13 +285,13 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <div className="mb-4">
             <button
               onClick={() => toggleSection('categories')}
-              className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide hover:text-purple-600 transition-colors"
+              className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide hover:text-blue-700 transition-colors"
             >
               <span className="flex items-center gap-2">
                 <Tag className="w-3.5 h-3.5" />
                 Categories
                 {filters.categories.length > 0 && (
-                  <span className="bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full text-xs font-bold">
+                  <span className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full text-xs font-bold">
                     {filters.categories.length}
                   </span>
                 )}
@@ -306,7 +306,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                       type="checkbox"
                       checked={filters.categories.includes(category)}
                       onChange={() => toggleArrayFilter('categories', category)}
-                      className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+                      className="w-4 h-4 rounded border-gray-300 text-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">{category}</span>
                   </label>
@@ -319,13 +319,13 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <div className="mb-4">
             <button
               onClick={() => toggleSection('platforms')}
-              className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide hover:text-purple-600 transition-colors"
+              className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide hover:text-blue-700 transition-colors"
             >
               <span className="flex items-center gap-2">
                 <Monitor className="w-3.5 h-3.5" />
                 Platforms
                 {filters.platforms.length > 0 && (
-                  <span className="bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full text-xs font-bold">
+                  <span className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full text-xs font-bold">
                     {filters.platforms.length}
                   </span>
                 )}
@@ -340,7 +340,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                       type="checkbox"
                       checked={filters.platforms.includes(platform)}
                       onChange={() => toggleArrayFilter('platforms', platform)}
-                      className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+                      className="w-4 h-4 rounded border-gray-300 text-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
                       {platformNames[platform as keyof typeof platformNames]}
@@ -355,12 +355,12 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <div className="mb-5">
             <button
               onClick={() => toggleSection('availability')}
-              className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide hover:text-purple-600 transition-colors"
+              className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide hover:text-blue-700 transition-colors"
             >
               <span className="flex items-center gap-2">
                 Availability
                 {filters.availability.length > 0 && (
-                  <span className="bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full text-xs font-bold">
+                  <span className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full text-xs font-bold">
                     {filters.availability.length}
                   </span>
                 )}
@@ -379,7 +379,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                       type="checkbox"
                       checked={filters.availability.includes(value)}
                       onChange={() => toggleArrayFilter('availability', value)}
-                      className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+                      className="w-4 h-4 rounded border-gray-300 text-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">{label}</span>
                   </label>
@@ -392,7 +392,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
-              className="w-full py-2.5 px-4 text-sm font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-all border border-purple-200 hover:border-purple-300"
+              className="w-full py-2.5 px-4 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all border border-purple-200 hover:border-blue-300"
             >
               Clear All Filters
             </button>

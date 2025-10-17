@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, MapPin, Star } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, MapPin, Star, ExternalLink } from 'lucide-react';
 import { Event } from '../types/Event';
 
 interface FeaturedCarouselProps {
@@ -9,10 +9,10 @@ interface FeaturedCarouselProps {
 
 const platformColors = {
   eventbrite: 'bg-orange-500',
-  ticketmaster: 'bg-blue-600',
+  ticketmaster: 'bg-blue-700',
   stubhub: 'bg-red-500',
   seatgeek: 'bg-green-600',
-  'vivid-seats': 'bg-purple-600'
+  'vivid-seats': 'bg-blue-600'
 };
 
 const platformNames = {
@@ -25,28 +25,38 @@ const platformNames = {
 
 export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEventClick }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const featuredEvents = events.slice(0, 5); // Show first 5 events as featured
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const featuredEvents = events.slice(0, 6); // Show first 6 events as featured
 
   useEffect(() => {
-    if (featuredEvents.length === 0) return;
+    if (featuredEvents.length === 0 || !isAutoPlaying) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % featuredEvents.length);
-    }, 5000); // Auto-advance every 5 seconds
+    }, 4000); // Auto-advance every 4 seconds
 
     return () => clearInterval(interval);
-  }, [featuredEvents.length]);
+  }, [featuredEvents.length, isAutoPlaying]);
 
   const goToNext = () => {
+    setIsAutoPlaying(false);
     setCurrentIndex((prev) => (prev + 1) % featuredEvents.length);
+    // Resume auto-play after 10 seconds
+    setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
   const goToPrevious = () => {
+    setIsAutoPlaying(false);
     setCurrentIndex((prev) => (prev - 1 + featuredEvents.length) % featuredEvents.length);
+    // Resume auto-play after 10 seconds
+    setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
   const goToSlide = (index: number) => {
+    setIsAutoPlaying(false);
     setCurrentIndex(index);
+    // Resume auto-play after 10 seconds
+    setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
   const formatDate = (dateString: string) => {
@@ -58,8 +68,8 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
     }
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
+      weekday: 'short',
+      month: 'short',
       day: 'numeric'
     });
   };
@@ -72,80 +82,155 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
 
   if (featuredEvents.length === 0) return null;
 
-  const currentEvent = featuredEvents[currentIndex];
+  // Calculate indices for the three visible cards
+  const getPrevIndex = () => (currentIndex - 1 + featuredEvents.length) % featuredEvents.length;
+  const getNextIndex = () => (currentIndex + 1) % featuredEvents.length;
+
+  const centerEvent = featuredEvents[currentIndex];
+  const leftEvent = featuredEvents[getPrevIndex()];
+  const rightEvent = featuredEvents[getNextIndex()];
 
   return (
-    <div className="relative w-full mb-8">
-      {/* Main Carousel */}
-      <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl group">
-        {/* Background Image with Overlay */}
+    <div className="relative w-full mb-16">
+      {/* 3D Carousel Container */}
+      <div className="relative h-[600px] md:h-[650px] flex items-center justify-center px-4 md:px-8">
+        {/* Left Card */}
         <div
-          className="absolute inset-0 bg-cover bg-center transition-all duration-700"
-          style={{ backgroundImage: `url(${currentEvent.image})` }}
+          className="absolute left-4 md:left-16 top-32 md:top-40 w-[280px] md:w-[340px] cursor-pointer transform scale-75 md:scale-80 opacity-50 hover:opacity-70 transition-all duration-500 z-10"
+          onClick={goToPrevious}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+            <div className="relative">
+              <img
+                src={leftEvent.image}
+                alt={leftEvent.title}
+                className="w-full h-56 md:h-64 object-cover"
+              />
+              <div className="absolute top-3 left-3">
+                <span className={`${platformColors[leftEvent.platform]} text-white text-xs font-semibold px-2 py-1 rounded-full`}>
+                  {platformNames[leftEvent.platform]}
+                </span>
+              </div>
+            </div>
+            <div className="p-4">
+              <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded-full">
+                {leftEvent.category}
+              </span>
+              <h3 className="font-bold text-lg text-gray-900 mt-2 line-clamp-2">
+                {leftEvent.title}
+              </h3>
+              <div className="flex items-center gap-2 text-sm text-gray-600 mt-3">
+                <Calendar className="w-4 h-4 text-blue-600" />
+                <span>{formatDate(leftEvent.date)}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
+                <MapPin className="w-4 h-4 text-blue-600" />
+                <span className="line-clamp-1">{leftEvent.location.city}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="relative h-full flex flex-col justify-end p-6 md:p-8">
-          <div className="max-w-2xl">
-            {/* Platform Badge */}
-            <div className="mb-4">
-              <span className={`${platformColors[currentEvent.platform]} text-white text-sm font-semibold px-4 py-2 rounded-full inline-block`}>
-                {platformNames[currentEvent.platform]}
-              </span>
-            </div>
-
-            {/* Category */}
-            <div className="mb-3">
-              <span className="text-purple-400 text-sm font-semibold uppercase tracking-wider">
-                {currentEvent.category}
-              </span>
-            </div>
-
-            {/* Title */}
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
-              {currentEvent.title}
-            </h2>
-
-            {/* Event Details */}
-            <div className="flex flex-wrap gap-4 mb-4">
-              <div className="flex items-center gap-2 text-white">
-                <Calendar className="w-5 h-5 text-purple-400" />
-                <span className="text-lg">{formatDate(currentEvent.date)}</span>
+        {/* Center Card (Main) */}
+        <div
+          className="relative w-[360px] md:w-[500px] cursor-pointer transform scale-100 z-30 hover:scale-[1.02] transition-all duration-500"
+          onClick={() => onEventClick(centerEvent)}
+        >
+          <div className="bg-white rounded-3xl shadow-[0_25px_80px_-20px_rgba(0,0,0,0.4)] overflow-hidden hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.5)] transition-all duration-300">
+            <div className="relative">
+              <img
+                src={centerEvent.image}
+                alt={centerEvent.title}
+                className="w-full h-80 md:h-96 object-cover"
+              />
+              <div className="absolute top-4 left-4">
+                <span className={`${platformColors[centerEvent.platform]} text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg`}>
+                  {platformNames[centerEvent.platform]}
+                </span>
               </div>
-
-              <div className="flex items-center gap-2 text-white">
-                <MapPin className="w-5 h-5 text-purple-400" />
-                <span className="text-lg">{currentEvent.location.venue}, {currentEvent.location.city}</span>
-              </div>
-
-              {currentEvent.rating && (
-                <div className="flex items-center gap-2 text-white">
-                  <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                  <span className="text-lg font-semibold">{currentEvent.rating}</span>
+              {centerEvent.rating && (
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1">
+                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                  <span className="text-sm font-bold text-gray-900">{centerEvent.rating}</span>
                 </div>
               )}
             </div>
 
-            {/* Description */}
-            <p className="text-gray-200 text-base mb-4 line-clamp-2">
-              {currentEvent.description}
-            </p>
-
-            {/* Price and CTA */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <div className="text-white">
-                <span className="text-2xl font-bold">
-                  {formatPrice(currentEvent.price.min, currentEvent.price.max, currentEvent.price.currency)}
+            <div className="p-6 md:p-7">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full">
+                  {centerEvent.category}
                 </span>
               </div>
-              <button
-                onClick={() => onEventClick(currentEvent)}
-                className="px-6 py-2.5 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                View Details
-              </button>
+
+              <h3 className="font-bold text-2xl md:text-3xl text-gray-900 mb-3 leading-tight line-clamp-2">
+                {centerEvent.title}
+              </h3>
+
+              <p className="text-gray-600 text-sm md:text-base mb-4 line-clamp-2">
+                {centerEvent.description}
+              </p>
+
+              <div className="space-y-2.5 mb-5">
+                <div className="flex items-center gap-2 text-sm md:text-base text-gray-700">
+                  <Calendar className="w-5 h-5 text-blue-600" />
+                  <span className="font-medium">{formatDate(centerEvent.date)}{centerEvent.time ? ` at ${centerEvent.time}` : ''}</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm md:text-base text-gray-700">
+                  <MapPin className="w-5 h-5 text-blue-600" />
+                  <span className="font-medium line-clamp-1">{centerEvent.location.venue}, {centerEvent.location.city}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-5 border-t border-gray-100">
+                <div className="text-2xl md:text-3xl font-bold text-gray-900">
+                  {centerEvent.price
+                    ? formatPrice(centerEvent.price.min, centerEvent.price.max, centerEvent.price.currency)
+                    : 'Free'}
+                </div>
+                <div className="flex items-center gap-2 text-blue-700 font-semibold text-sm md:text-base">
+                  <span>View Details</span>
+                  <ExternalLink className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Card */}
+        <div
+          className="absolute right-4 md:right-16 top-32 md:top-40 w-[280px] md:w-[340px] cursor-pointer transform scale-75 md:scale-80 opacity-50 hover:opacity-70 transition-all duration-500 z-10"
+          onClick={goToNext}
+        >
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+            <div className="relative">
+              <img
+                src={rightEvent.image}
+                alt={rightEvent.title}
+                className="w-full h-56 md:h-64 object-cover"
+              />
+              <div className="absolute top-3 left-3">
+                <span className={`${platformColors[rightEvent.platform]} text-white text-xs font-semibold px-2 py-1 rounded-full`}>
+                  {platformNames[rightEvent.platform]}
+                </span>
+              </div>
+            </div>
+            <div className="p-4">
+              <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded-full">
+                {rightEvent.category}
+              </span>
+              <h3 className="font-bold text-lg text-gray-900 mt-2 line-clamp-2">
+                {rightEvent.title}
+              </h3>
+              <div className="flex items-center gap-2 text-sm text-gray-600 mt-3">
+                <Calendar className="w-4 h-4 text-blue-600" />
+                <span>{formatDate(rightEvent.date)}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
+                <MapPin className="w-4 h-4 text-blue-600" />
+                <span className="line-clamp-1">{rightEvent.location.city}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -155,17 +240,17 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
           <>
             <button
               onClick={goToPrevious}
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all opacity-0 group-hover:opacity-100"
+              className="absolute left-0 md:-left-4 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-white hover:bg-blue-50 text-blue-700 rounded-full transition-all shadow-lg hover:shadow-xl z-30 hover:scale-110"
               aria-label="Previous event"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
             <button
               onClick={goToNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all opacity-0 group-hover:opacity-100"
+              className="absolute right-0 md:-right-4 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-white hover:bg-blue-50 text-blue-700 rounded-full transition-all shadow-lg hover:shadow-xl z-30 hover:scale-110"
               aria-label="Next event"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
             </button>
           </>
         )}
@@ -173,15 +258,15 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
 
       {/* Dots Navigation */}
       {featuredEvents.length > 1 && (
-        <div className="flex justify-center gap-2 mt-6">
+        <div className="flex justify-center gap-2 mt-8">
           {featuredEvents.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               className={`transition-all ${
                 index === currentIndex
-                  ? 'w-8 h-3 bg-purple-600'
-                  : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
+                  ? 'w-10 h-2.5 bg-blue-700'
+                  : 'w-2.5 h-2.5 bg-gray-300 hover:bg-gray-400'
               } rounded-full`}
               aria-label={`Go to slide ${index + 1}`}
             />

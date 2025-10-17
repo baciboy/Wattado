@@ -9,10 +9,10 @@ interface EventCardProps {
 
 const platformColors = {
   eventbrite: 'bg-orange-500',
-  ticketmaster: 'bg-blue-600',
+  ticketmaster: 'bg-blue-700',
   stubhub: 'bg-red-500',
   seatgeek: 'bg-green-600',
-  'vivid-seats': 'bg-purple-600'
+  'vivid-seats': 'bg-blue-600'
 };
 
 const platformNames = {
@@ -83,7 +83,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onEventClick }) => 
 
       <div className="p-5">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
+          <span className="text-sm font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded-full">
             {event.category}
           </span>
           {event.rating && (
@@ -94,35 +94,35 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onEventClick }) => 
           )}
         </div>
 
-        <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-purple-600 transition-colors line-clamp-2">
+        <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-700 transition-colors line-clamp-2">
           {event.title}
         </h3>
-        
+
         <p className="text-gray-600 text-sm mb-4 line-clamp-3">
           {event.description}
         </p>
 
         <div className="space-y-2 mb-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Calendar className="w-4 h-4 text-purple-500" />
+            <Calendar className="w-4 h-4 text-blue-600" />
             <span>{formatDate(event.date)}{event.time ? ` at ${event.time}` : ''}</span>
           </div>
-          
+
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <MapPin className="w-4 h-4 text-purple-500" />
+            <MapPin className="w-4 h-4 text-blue-600" />
             <span>{event.location.venue}, {event.location.city}</span>
           </div>
 
           {event.attendees && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Users className="w-4 h-4 text-purple-500" />
+              <Users className="w-4 h-4 text-blue-600" />
               <span>{event.attendees.toLocaleString()} attending</span>
             </div>
           )}
 
           {event.genre && event.platform === 'ticketmaster' && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="w-4 h-4 text-purple-500">🎵</span>
+              <span className="w-4 h-4 text-blue-600">🎵</span>
               <span>{event.genre}{event.subGenre ? ` • ${event.subGenre}` : ''}</span>
             </div>
           )}
@@ -134,7 +134,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onEventClick }) => 
               ? formatPrice(event.price.min, event.price.max, event.price.currency)
               : 'Price not available'}
           </div>
-          <div className="flex items-center gap-1 text-purple-600 font-medium text-sm group-hover:text-purple-700">
+          <div className="flex items-center gap-1 text-blue-700 font-medium text-sm group-hover:text-blue-800">
             <span>View Details</span>
             <ExternalLink className="w-4 h-4" />
           </div>

@@ -13,7 +13,7 @@ const platformColors = {
   ticketmaster: 'bg-blue-600',
   stubhub: 'bg-red-500',
   seatgeek: 'bg-green-600',
-  'vivid-seats': 'bg-purple-600'
+  'vivid-seats': 'bg-blue-700'
 };
 
 const platformNames = {
@@ -79,7 +79,7 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
           <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-sm font-medium text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+                <span className="text-sm font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
                   {event.category}
                 </span>
                 {event.rating && (
@@ -135,7 +135,7 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-purple-500 mt-1" />
+                <Calendar className="w-5 h-5 text-blue-500 mt-1" />
                 <div>
                   <p className="font-semibold text-gray-900">{formatDate(event.date)}</p>
                   <p className="text-gray-600 text-sm">Event Date</p>
@@ -143,7 +143,7 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
               </div>
 
               <div className="flex items-start gap-3">
-                <Clock className="w-5 h-5 text-purple-500 mt-1" />
+                <Clock className="w-5 h-5 text-blue-500 mt-1" />
                 <div>
                   <p className="font-semibold text-gray-900">{event.time}</p>
                   <p className="text-gray-600 text-sm">Start Time</p>
@@ -152,7 +152,7 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
 
               {event.attendees && (
                 <div className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-purple-500 mt-1" />
+                  <Users className="w-5 h-5 text-blue-500 mt-1" />
                   <div>
                     <p className="font-semibold text-gray-900">{event.attendees.toLocaleString()}</p>
                     <p className="text-gray-600 text-sm">People attending</p>
@@ -163,7 +163,7 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
 
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-purple-500 mt-1" />
+                <MapPin className="w-5 h-5 text-blue-500 mt-1" />
                 <div>
                   <p className="font-semibold text-gray-900">{event.location.venue}</p>
                   <p className="text-gray-600">{event.location.city}, {event.location.state}</p>
@@ -174,7 +174,7 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
                         const { latitude, longitude } = event.location.coordinates!;
                         window.open(`https://maps.google.com/?q=${latitude},${longitude}`, '_blank');
                       }}
-                      className="text-purple-600 hover:text-purple-700 text-sm font-medium mt-1"
+                      className="text-blue-700 hover:text-blue-800 text-sm font-medium mt-1"
                     >
                       View on Map →
                     </button>
@@ -183,7 +183,7 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
               </div>
 
               <div className="flex items-start gap-3">
-                <DollarSign className="w-5 h-5 text-purple-500 mt-1" />
+                <DollarSign className="w-5 h-5 text-blue-500 mt-1" />
                 <div>
                   <p className="font-semibold text-gray-900">
                     {formatPrice(event.price.min, event.price.max, event.price.currency)}
@@ -202,7 +202,7 @@ export const EventModal: React.FC<EventModalProps> = ({ event, isOpen, onClose }
               className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
                 event.availability === 'sold-out'
                   ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg hover:shadow-xl'
+                  : 'bg-blue-700 text-white hover:bg-blue-800 shadow-lg hover:shadow-xl'
               }`}
             >
               <span>

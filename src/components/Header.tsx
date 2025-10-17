@@ -1,13 +1,16 @@
 import React from 'react';
-import { Filter, Calendar, TrendingUp } from 'lucide-react';
+import { Calendar, TrendingUp } from 'lucide-react';
 import { UserMenu } from './header/UserMenu';
+import { FilterDropdown } from './header/FilterDropdown';
+import { FilterState } from '../types/Event';
 
 interface HeaderProps {
-  onFilterToggle: () => void;
   totalEvents: number;
+  filters: FilterState;
+  onFiltersChange: (filters: FilterState) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onFilterToggle, totalEvents }) => {
+export const Header: React.FC<HeaderProps> = ({ totalEvents, filters, onFiltersChange }) => {
 
   return (
     <div className="bg-white border-b border-gray-200">
@@ -15,10 +18,10 @@ export const Header: React.FC<HeaderProps> = ({ onFilterToggle, totalEvents }) =
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-700 to-blue-500 rounded-xl flex items-center justify-center">
                 <Calendar className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
                 Wattado
               </h1>
             </div>
@@ -28,21 +31,19 @@ export const Header: React.FC<HeaderProps> = ({ onFilterToggle, totalEvents }) =
           </div>
 
           <div className="flex items-center gap-4 relative">
-            <div className="bg-purple-50 px-4 py-2 rounded-xl">
-              <div className="flex items-center gap-2 text-purple-700">
+            <div className="bg-blue-50 px-4 py-2 rounded-xl">
+              <div className="flex items-center gap-2 text-blue-700">
                 <TrendingUp className="w-5 h-5" />
                 <span className="font-semibold">{totalEvents.toLocaleString()}</span>
                 <span className="text-sm">events found</span>
               </div>
             </div>
 
-            <button
-              onClick={onFilterToggle}
-              className="lg:hidden flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors"
-            >
-              <Filter className="w-5 h-5" />
-              <span>Filters</span>
-            </button>
+            <FilterDropdown
+              filters={filters}
+              onFiltersChange={onFiltersChange}
+              eventCount={totalEvents}
+            />
 
             <UserMenu />
           </div>

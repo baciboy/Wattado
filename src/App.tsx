@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react';
 import { Event, TicketmasterEvent, TicketmasterResponse, FilterState } from './types/Event';
 
 function App() {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -295,8 +294,6 @@ function App() {
           element={
             <HomePage
               filteredEvents={filteredEvents}
-              isFilterOpen={isFilterOpen}
-              setIsFilterOpen={setIsFilterOpen}
               filters={filters}
               onFiltersChange={setFilters}
               handleEventClick={handleEventClick}
