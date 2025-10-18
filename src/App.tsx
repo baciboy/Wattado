@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
+import AccountPage from "./pages/AccountPage";
 import { EventModal } from './components/EventModal';
 import { useState, useEffect } from 'react';
 import { Event, TicketmasterEvent, TicketmasterResponse, FilterState } from './types/Event';
@@ -261,7 +262,7 @@ function App() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-full bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <span className="text-xl text-purple-600">Loading...</span>
         </div>
@@ -272,7 +273,7 @@ function App() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-full bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md">
           <p className="text-gray-600 mb-4">{error}</p>
           <button
@@ -287,28 +288,31 @@ function App() {
   }
 
   return (
-    <Router basename={import.meta.env.BASE_URL}>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <HomePage
-              filteredEvents={filteredEvents}
-              filters={filters}
-              onFiltersChange={setFilters}
-              handleEventClick={handleEventClick}
-            />
-          }
+    <div className="h-full">
+      <Router basename={import.meta.env.BASE_URL}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage
+                filteredEvents={filteredEvents}
+                filters={filters}
+                onFiltersChange={setFilters}
+                handleEventClick={handleEventClick}
+              />
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/account" element={<AccountPage />} />
+        </Routes>
+        <EventModal
+          event={selectedEvent}
+          isOpen={isModalOpen}
+          onClose={closeModal}
         />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-      </Routes>
-      <EventModal
-        event={selectedEvent}
-        isOpen={isModalOpen}
-        onClose={closeModal}
-      />
-    </Router>
+      </Router>
+    </div>
   );
 }
 

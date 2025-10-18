@@ -9,13 +9,15 @@ const SignupPage: React.FC = () => {
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setIsSubmitting(true);
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -27,7 +29,26 @@ const SignupPage: React.FC = () => {
         setError(signUpError.message);
         return;
       }
-      navigate('/');
+
+      // Check if email confirmation is required
+      if (data?.user && data.user.identities && data.user.identities.length === 0) {
+        // User already exists
+        setError('An account with this email already exists. Please log in instead.');
+        return;
+      }
+
+      if (data?.user && !data.session) {
+        // Email confirmation required
+        setSuccess('Account created! Please check your email to verify your account before logging in.');
+      } else {
+        // Auto-login successful (no email confirmation required)
+        setSuccess('Account created successfully! Redirecting...');
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -68,19 +89,35 @@ const SignupPage: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+          {success && (
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-600">{success}</p>
+            </div>
+          )}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !!success}
             className="w-full py-2 mt-2 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800 transition disabled:opacity-50"
           >
             {isSubmitting ? 'Creating account…' : 'Sign up'}
           </button>
         </form>
-        <div className="text-center mt-4">
-          <span className="text-gray-600">Already have an account?</span>
-          <a href="/login" className="ml-2 text-blue-700 font-semibold hover:underline">Log in</a>
-        </div>
+        {!success && (
+          <div className="text-center mt-4">
+            <span className="text-gray-600">Already have an account?</span>
+            <a href="/login" className="ml-2 text-blue-700 font-semibold hover:underline">Log in</a>
+          </div>
+        )}
+        {success && (
+          <div className="text-center mt-4">
+            <a href="/login" className="text-blue-700 font-semibold hover:underline">Go to login →</a>
+          </div>
+        )}
       </div>
     </div>
   );
