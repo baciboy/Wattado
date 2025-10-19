@@ -33,6 +33,13 @@ Welcome to the Wattado technical documentation! This folder contains comprehensi
    - Error handling and rate limits
    - Future integrations (Eventbrite, OpenAI)
 
+5. **[AI Integration](./ai-integration.md)** - AI-powered features and setup
+   - Vercel AI SDK with Amazon Bedrock
+   - Natural language event search
+   - Trending events detection
+   - Personalized recommendations (future)
+   - Cost estimation and optimization
+
 ## Quick Links
 
 ### For Developers
@@ -47,6 +54,7 @@ Welcome to the Wattado technical documentation! This folder contains comprehensi
 
 ### For Product/Planning
 - **API Capabilities**: [api-integrations.md](./api-integrations.md)
+- **AI Features**: [ai-integration.md](./ai-integration.md)
 - **Database Schema**: [database.md#database-schema](./database.md#database-schema)
 - **Future Roadmap**: See [database.md#future-tables-planned](./database.md#future-tables-planned)
 
@@ -88,6 +96,7 @@ Last updated: 2025-10-19
 - ✅ Added deployment documentation with Vercel setup
 - ✅ Added API integration documentation
 - ✅ Added architecture documentation
+- ✅ Added AI integration guide with Vercel AI SDK + Amazon Bedrock
 
 ### Planned Updates
 - [ ] Add testing documentation
@@ -101,6 +110,8 @@ Last updated: 2025-10-19
 - **GitHub Issues**: [Report issues](https://github.com/anthropics/claude-code/issues)
 - **Supabase Docs**: [supabase.com/docs](https://supabase.com/docs)
 - **Vercel Docs**: [vercel.com/docs](https://vercel.com/docs)
+- **Vercel AI SDK**: [ai-sdk.dev/docs](https://ai-sdk.dev/docs)
+- **Amazon Bedrock**: [aws.amazon.com/bedrock](https://aws.amazon.com/bedrock)
 - **Ticketmaster Docs**: [developer.ticketmaster.com](https://developer.ticketmaster.com)
 
 ## Document Versions
@@ -111,6 +122,7 @@ Last updated: 2025-10-19
 | database.md | 1.0 | 2025-10-19 |
 | deployment.md | 1.0 | 2025-10-19 |
 | api-integrations.md | 1.0 | 2025-10-19 |
+| ai-integration.md | 1.0 | 2025-10-19 |
 
 ---
 
