@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "^3.0.43",
     "@supabase/supabase-js": "^2.57.4",
+    "ai": "^5.0.76",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",

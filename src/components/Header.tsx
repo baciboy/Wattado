@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Calendar, TrendingUp, Search } from 'lucide-react';
+import { Calendar, TrendingUp, Search, Sparkles } from 'lucide-react';
 import { UserMenu } from './header/UserMenu';
 import { FilterDropdown } from './header/FilterDropdown';
 import { FilterState } from '../types/Event';
+import { parseNaturalLanguageQuery } from '../services/aiService';
 
 interface HeaderProps {
   totalEvents: number;
@@ -12,6 +13,8 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ totalEvents, filters, onFiltersChange }) => {
   const [searchInput, setSearchInput] = useState(filters.search || '');
+  const [isAISearching, setIsAISearching] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState('');
 
   const quickFilters = [
     { label: 'This Weekend', action: () => {
@@ -26,9 +29,74 @@ export const Header: React.FC<HeaderProps> = ({ totalEvents, filters, onFiltersC
     { label: 'Arts', action: () => onFiltersChange({ ...filters, categories: ['Arts'] }) },
   ];
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    onFiltersChange({ ...filters, search: searchInput });
+
+    if (!searchInput.trim()) {
+      return;
+    }
+
+    // Check if query looks like natural language (more than 2 words)
+    const wordCount = searchInput.trim().split(/\s+/).length;
+    const hasNaturalLanguagePattern =
+      wordCount > 2 ||
+      /\b(find|show|looking for|want|need|romantic|stylish|fun|cool)\b/i.test(searchInput);
+
+    if (hasNaturalLanguagePattern) {
+      // Use AI to parse the query
+      setIsAISearching(true);
+      setAiExplanation('');
+
+      try {
+        const aiResult = await parseNaturalLanguageQuery(searchInput);
+
+        // Show explanation to user
+        setAiExplanation(aiResult.explanation);
+
+        // Update filters based on AI params
+        const newFilters: FilterState = {
+          ...filters,
+          search: searchInput,
+        };
+
+        if (aiResult.searchParams.location) {
+          newFilters.location = aiResult.searchParams.location;
+        }
+
+        if (aiResult.searchParams.category) {
+          newFilters.categories = [aiResult.searchParams.category];
+        }
+
+        if (aiResult.searchParams.priceRange) {
+          newFilters.priceRange = {
+            min: aiResult.searchParams.priceRange.min || filters.priceRange.min,
+            max: aiResult.searchParams.priceRange.max || filters.priceRange.max,
+          };
+        }
+
+        if (aiResult.searchParams.dateRange) {
+          newFilters.dateRange = {
+            start: aiResult.searchParams.dateRange.start || filters.dateRange.start,
+            end: aiResult.searchParams.dateRange.end || filters.dateRange.end,
+          };
+        }
+
+        onFiltersChange(newFilters);
+
+        // Clear explanation after 5 seconds
+        setTimeout(() => setAiExplanation(''), 5000);
+
+      } catch (error) {
+        console.error('AI search failed, falling back to regular search:', error);
+        // Fall back to regular search
+        onFiltersChange({ ...filters, search: searchInput });
+      } finally {
+        setIsAISearching(false);
+      }
+    } else {
+      // Regular search for simple queries
+      onFiltersChange({ ...filters, search: searchInput });
+    }
   };
 
   return (
@@ -68,24 +136,40 @@ export const Header: React.FC<HeaderProps> = ({ totalEvents, filters, onFiltersC
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* AI-Powered Search Bar */}
         <form onSubmit={handleSearch} className="mb-4">
           <div className="relative max-w-2xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search events, artists, or venues..."
+              placeholder="Try: 'romantic date night events' or 'stylish art shows this weekend'"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full pl-12 pr-28 py-3 rounded-2xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-gray-900 placeholder-gray-400 bg-white shadow-sm hover:shadow-md transition-all"
+              disabled={isAISearching}
+              className="w-full pl-12 pr-28 py-3 rounded-2xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-gray-900 placeholder-gray-400 bg-white shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             />
+            {isAISearching && (
+              <div className="absolute right-32 top-1/2 -translate-y-1/2 flex items-center gap-2 text-purple-600">
+                <Sparkles className="w-5 h-5 animate-pulse" />
+                <span className="text-sm font-medium">AI thinking...</span>
+              </div>
+            )}
             <button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all text-sm"
+              disabled={isAISearching}
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Search
+              {isAISearching ? 'Searching...' : 'Search'}
             </button>
           </div>
+
+          {/* AI Explanation */}
+          {aiExplanation && (
+            <div className="mt-3 flex items-start gap-2 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl px-4 py-2.5 max-w-2xl">
+              <Sparkles className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-purple-900 font-medium">{aiExplanation}</p>
+            </div>
+          )}
         </form>
 
         {/* Quick Filter Chips */}
