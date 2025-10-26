@@ -32,6 +32,23 @@ export interface Event {
   promoter?: string;
 }
 
+// Grouped multi-date event model for future use in UI and services
+export interface EventDate {
+  date: string;
+  time?: string;
+  ticketmasterId?: string;
+  venueName?: string;
+  price?: { min: number; max: number; currency: string };
+}
+
+export interface EventGroup {
+  id: string; // stable grouping key (normalized title + venue or platform-specific composite)
+  title: string;
+  base: Event; // representative event (image, url, location, category)
+  dates: EventDate[]; // all showtimes for this grouped event
+  priceRange: { min: number; max: number; currency: string };
+}
+
 export interface TicketmasterEvent {
   id: string;
   name: string;

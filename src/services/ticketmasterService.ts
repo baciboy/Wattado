@@ -60,8 +60,11 @@ class TicketmasterService {
         ...params.classificationName && { classificationName: params.classificationName },
       });
 
-      // Format the URL to work with our proxy
-      const url = `/api/discovery/v2/events.json?${searchParams}`;
+      // Dev uses Vite proxy; production calls Ticketmaster directly
+      const base = import.meta.env.PROD
+        ? 'https://app.ticketmaster.com'
+        : '';
+      const url = `${base}/discovery/v2/events.json?${searchParams}`;
       console.log('Fetching events from:', url);
       
       const response = await fetch(url);
@@ -87,6 +90,167 @@ class TicketmasterService {
       console.error('Error fetching events from Ticketmaster:', error);
       return [];
     }
+  }
+
+  // Return aggregated events (multi-date grouped into a single card)
+  async searchGroupedEvents(params: TicketmasterSearchParams = {}): Promise<Event[]> {
+    const baseParams: TicketmasterSearchParams = {
+      size: 200,
+      sort: 'date,asc',
+      countryCode: params.countryCode || 'GB',
+      ...params
+    };
+
+    // Fetch raw Ticketmaster data first (as TicketmasterEvent[])
+    const apiKey = this.apiKey;
+    if (!apiKey) return [];
+
+    const formatDate = (date: Date): string => date.toISOString().split('.')[0] + 'Z';
+    const now = formatDate(new Date());
+    const searchParams = new URLSearchParams({
+      apikey: apiKey,
+      size: String(baseParams.size || 200),
+      page: String(baseParams.page || 0),
+      sort: baseParams.sort || 'date,asc',
+      countryCode: baseParams.countryCode || 'GB',
+      startDateTime: baseParams.startDateTime ? formatDate(new Date(baseParams.startDateTime)) : now,
+      ...baseParams.keyword && { keyword: baseParams.keyword },
+      ...baseParams.city && { city: baseParams.city },
+      ...baseParams.stateCode && { stateCode: baseParams.stateCode },
+      ...baseParams.endDateTime && { endDateTime: baseParams.endDateTime },
+      ...baseParams.classificationName && { classificationName: baseParams.classificationName },
+    });
+
+    const base = import.meta.env.PROD ? 'https://app.ticketmaster.com' : '';
+    const url = `${base}/discovery/v2/events.json?${searchParams}`;
+    const response = await fetch(url);
+    if (!response.ok) return [];
+    const data: TicketmasterResponse = await response.json();
+    const tmEvents = data._embedded?.events || [];
+
+    // Grouping by normalized title + venue
+    const eventMap = new Map<string, {
+      id: string;
+      title: string;
+      description: string;
+      location: Event['location'];
+      price: Event['price'];
+      category: string;
+      platform: Event['platform'];
+      image: string;
+      url: string;
+      availability: Event['availability'];
+      rating?: number;
+      attendees?: number;
+      ticketmasterId?: string;
+      genre?: string;
+      subGenre?: string;
+      promoter?: string;
+      dates: string[];
+      times: string[];
+    }>();
+
+    const cleanName = (raw: string) => raw
+      .replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat)/gi, '')
+      .replace(/\d{1,2}:\d{2}/g, '')
+      .replace(/\s*&\s*/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/-\s*$/g, '')
+      .trim();
+
+    tmEvents.forEach((e: TicketmasterEvent) => {
+      const rawName = e.name || 'Untitled Event';
+      const cleanTitle = cleanName(rawName);
+      const normalizedName = cleanTitle.toLowerCase();
+      const venueName = (e._embedded?.venues?.[0]?.name || 'Unknown').trim().toLowerCase();
+      const key = `${normalizedName}__${venueName}`;
+      const date = e.dates?.start?.localDate || '';
+      const time = e.dates?.start?.localTime || '';
+
+      if (eventMap.has(key)) {
+        const grouped = eventMap.get(key)!;
+        if (date && !grouped.dates.includes(date)) grouped.dates.push(date);
+        if (time && !grouped.times.includes(time)) grouped.times.push(time);
+      } else {
+        const mapped = this.mapTicketmasterEventToEvent(e);
+        eventMap.set(key, {
+          id: key,
+          title: cleanTitle,
+          description: mapped.description || '',
+          location: mapped.location,
+          price: mapped.price,
+          category: mapped.category,
+          platform: mapped.platform,
+          image: mapped.image,
+          url: mapped.url,
+          availability: mapped.availability,
+          rating: mapped.rating,
+          attendees: mapped.attendees,
+          ticketmasterId: mapped.ticketmasterId,
+          genre: mapped.genre,
+          subGenre: mapped.subGenre,
+          promoter: mapped.promoter,
+          dates: date ? [date] : [],
+          times: time ? [time] : []
+        });
+      }
+    });
+
+    // Aggregate price and produce final Event[]
+    const sortedDates = (dates: string[]) => dates.filter(Boolean).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
+    const groupedEvents: Event[] = Array.from(eventMap.values()).map(g => {
+      // Aggregate min/max across matching tmEvents
+      let minPrice = Number.POSITIVE_INFINITY;
+      let maxPrice = 0;
+      let currency = g.price.currency;
+      let foundPrice = false;
+      tmEvents.forEach(ev => {
+        const nameKey = cleanName(ev.name || '').toLowerCase();
+        const venueKey = (ev._embedded?.venues?.[0]?.name || 'Unknown').trim().toLowerCase();
+        const evKey = `${nameKey}__${venueKey}`;
+        if (evKey === g.id && ev.priceRanges && ev.priceRanges.length > 0) {
+          ev.priceRanges.forEach(pr => {
+            if (typeof pr.min === 'number' && pr.min > 0) {
+              minPrice = Math.min(minPrice, pr.min);
+              foundPrice = true;
+            }
+            if (typeof pr.max === 'number') {
+              maxPrice = Math.max(maxPrice, pr.max);
+            }
+            if (pr.currency) currency = pr.currency;
+          });
+        }
+      });
+      if (!foundPrice) minPrice = 0;
+      const validDates = sortedDates(g.dates);
+      const dateStr = validDates.length > 1
+        ? `${validDates[0]} - ${validDates[validDates.length - 1]}`
+        : (validDates[0] || '');
+      const timeStr = g.times.length > 1 ? g.times.join(', ') : (g.times[0] || '');
+      return {
+        id: g.id,
+        title: g.title,
+        description: g.description,
+        date: dateStr,
+        time: timeStr,
+        location: g.location,
+        price: { min: minPrice, max: maxPrice, currency },
+        category: g.category,
+        platform: g.platform,
+        image: g.image,
+        url: g.url,
+        availability: g.availability,
+        rating: g.rating,
+        attendees: g.attendees,
+        ticketmasterId: g.ticketmasterId,
+        genre: g.genre,
+        subGenre: g.subGenre,
+        promoter: g.promoter
+      };
+    });
+
+    return groupedEvents;
   }
 
   private mapTicketmasterEventToEvent = (tmEvent: TicketmasterEvent): Event => {
