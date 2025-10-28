@@ -149,7 +149,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-96 max-h-[80vh] overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-2xl z-50">
+        <div className="absolute right-0 top-full mt-2 w-96 max-h-[80vh] overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-2xl z-[9999]">
           <div className="p-5">
             {/* Header */}
             <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-200">

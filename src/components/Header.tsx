@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({ totalEvents, filters, onFiltersC
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
+    <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm relative z-50">
       <div className="w-full px-4 py-8 lg:px-8 xl:px-12">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
           <div>
