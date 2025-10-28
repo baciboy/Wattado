@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useFavourites } from '../hooks/useFavourites';
 import { supabase } from '../services/supabaseClient';
-import { User, Mail, Calendar as CalendarIcon, LogOut, Users, Heart, Settings, Home, MapPin, Calendar, Star } from 'lucide-react';
+import { User, Mail, Calendar as CalendarIcon, LogOut, Users, Heart, Settings, Home, MapPin, Calendar, Star, Key, X, Check, AlertCircle } from 'lucide-react';
 import { Event } from '../types/Event';
 
 type MenuSection = 'overview' | 'friends' | 'favourites' | 'settings';
@@ -14,9 +14,68 @@ const AccountPage: React.FC = () => {
   const { favourites, isLoading: favouritesLoading, toggleFavourite } = useFavourites();
   const [activeSection, setActiveSection] = useState<MenuSection>('overview');
 
+  // Change Password Modal State
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/');
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess(false);
+
+    // Validation
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters long');
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: passwordForm.newPassword
+      });
+
+      if (error) {
+        setPasswordError(error.message);
+      } else {
+        setPasswordSuccess(true);
+        setPasswordForm({ newPassword: '', confirmPassword: '' });
+
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          setShowPasswordModal(false);
+          setPasswordSuccess(false);
+        }, 2000);
+      }
+    } catch (error) {
+      setPasswordError('Failed to change password. Please try again.');
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
+  const closePasswordModal = () => {
+    setShowPasswordModal(false);
+    setPasswordForm({ newPassword: '', confirmPassword: '' });
+    setPasswordError('');
+    setPasswordSuccess(false);
   };
 
   // Redirect to login if not authenticated
@@ -335,11 +394,19 @@ const AccountPage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="p-4 border border-gray-200 rounded-xl">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold text-gray-900">Change Password</p>
-                          <p className="text-sm text-gray-600">Update your password to keep your account secure</p>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <Key className="w-5 h-5 text-blue-700" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">Change Password</p>
+                            <p className="text-sm text-gray-600">Update your password to keep your account secure</p>
+                          </div>
                         </div>
-                        <button className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium">
+                        <button
+                          onClick={() => setShowPasswordModal(true)}
+                          className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
+                        >
                           Change
                         </button>
                       </div>
@@ -375,6 +442,106 @@ const AccountPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative">
+            {/* Close Button */}
+            <button
+              onClick={closePasswordModal}
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+
+            {/* Header */}
+            <div className="mb-6">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                <Key className="w-6 h-6 text-blue-700" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Change Password</h2>
+              <p className="text-gray-600 text-sm">Enter your new password below</p>
+            </div>
+
+            {/* Success Message */}
+            {passwordSuccess && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-green-900">Password Changed!</p>
+                  <p className="text-sm text-green-700">Your password has been updated successfully</p>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {passwordError && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                <p className="text-sm text-red-700">{passwordError}</p>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={passwordForm.newPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                  placeholder="Enter new password"
+                  disabled={isChangingPassword || passwordSuccess}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  required
+                  minLength={6}
+                />
+                <p className="text-xs text-gray-500 mt-1">Must be at least 6 characters</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                  placeholder="Confirm new password"
+                  disabled={isChangingPassword || passwordSuccess}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  required
+                  minLength={6}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={closePasswordModal}
+                  disabled={isChangingPassword}
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isChangingPassword || passwordSuccess}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isChangingPassword ? 'Changing...' : 'Change Password'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
