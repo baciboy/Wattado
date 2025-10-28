@@ -15,7 +15,7 @@ export const UserMenu: React.FC = () => {
     return (
       <Link
         to="/login"
-        className="px-4 py-2 rounded-xl bg-blue-700 text-white hover:bg-blue-800 transition-colors"
+        className="px-4 py-2 rounded-xl bg-blue-700 text-white hover:bg-blue-800 transition-colors font-semibold shadow-sm hover:shadow-md whitespace-nowrap"
       >
         Log in
       </Link>
@@ -26,7 +26,7 @@ export const UserMenu: React.FC = () => {
     <div className="flex items-center gap-2">
       <Link
         to="/account"
-        className="px-4 py-2 rounded-xl bg-blue-700 text-white hover:bg-blue-800 transition-colors"
+        className="px-4 py-2 rounded-xl bg-blue-700 text-white hover:bg-blue-800 transition-colors font-semibold shadow-sm hover:shadow-md whitespace-nowrap"
       >
         My Account
       </Link>

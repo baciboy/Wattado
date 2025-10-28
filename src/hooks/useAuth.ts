@@ -20,6 +20,18 @@ export function useAuth(): AuthState {
   useEffect(() => {
     let isMounted = true;
 
+    // Set a timeout to ensure loading doesn't hang indefinitely
+    const loadingTimeout = setTimeout(() => {
+      if (isMounted) {
+        console.warn('Auth initialization timed out after 5 seconds');
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: new Error('Authentication initialization timed out')
+        }));
+      }
+    }, 5000);
+
     const bootstrap = async () => {
       try {
         const {
@@ -28,6 +40,8 @@ export function useAuth(): AuthState {
         } = await supabase.auth.getSession();
 
         if (!isMounted) return;
+
+        clearTimeout(loadingTimeout);
 
         if (error) {
           setState({ user: null, session: null, isLoading: false, error });
@@ -43,6 +57,7 @@ export function useAuth(): AuthState {
         });
       } catch (err) {
         if (!isMounted) return;
+        clearTimeout(loadingTimeout);
         const error = err instanceof Error ? err : new Error('Unknown error during auth initialization');
         setState({ user: null, session: null, isLoading: false, error });
         console.error('Error bootstrapping auth:', error);
@@ -63,6 +78,7 @@ export function useAuth(): AuthState {
 
     return () => {
       isMounted = false;
+      clearTimeout(loadingTimeout);
       subscription.subscription.unsubscribe();
     };
   }, []);

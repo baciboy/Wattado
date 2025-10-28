@@ -66,7 +66,7 @@ const HomePage: React.FC<HomePageProps> = ({
         onFiltersChange={onFiltersChange}
       />
       <div className="flex-1 overflow-y-auto w-full">
-        <div className="max-w-[1920px] mx-auto px-4 py-10 md:py-16 lg:px-8 xl:px-16 2xl:px-20">
+        <div className="max-w-[1920px] mx-auto px-4 py-8 md:py-12 lg:px-6 xl:px-12 2xl:px-16">
         {filteredEvents.length === 0 ? (
           <div className="text-center py-20 md:py-24">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -100,7 +100,7 @@ const HomePage: React.FC<HomePageProps> = ({
             />
 
             {/* Category Sections */}
-            <div className="mt-20 md:mt-24 space-y-16 md:space-y-20">
+            <div className="mt-8 md:mt-10 space-y-8 md:space-y-10">
               {Object.entries(categorizedEvents).map(([category, events]) => {
                 if (events.length === 0) return null;
 
@@ -114,29 +114,29 @@ const HomePage: React.FC<HomePageProps> = ({
 
                 return (
                   <div key={category}>
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center justify-between mb-5">
                       <div className="flex items-center gap-3">
-                        <span className="text-3xl">{categoryIcons[category]}</span>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                        <span className="text-2xl">{categoryIcons[category]}</span>
+                        <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">
                           {category}
                         </h2>
                       </div>
                       {events.length > 6 && (
                         <button
                           onClick={() => onFiltersChange({ ...filters, categories: [category] })}
-                          className="flex items-center gap-2 text-blue-700 hover:text-blue-800 font-semibold transition-colors"
+                          className="flex items-center gap-1.5 text-blue-700 hover:text-blue-800 font-semibold transition-colors text-sm"
                         >
                           View All
-                          <ChevronRight className="w-5 h-5" />
+                          <ChevronRight className="w-4 h-4" />
                         </button>
                       )}
                     </div>
 
                     {/* Horizontal Scrollable Grid */}
-                    <div className="overflow-x-auto pb-4 -mx-4 px-4 md:-mx-8 md:px-8 lg:-mx-16 lg:px-16 2xl:-mx-20 2xl:px-20">
-                      <div className="flex gap-6 min-w-max">
+                    <div className="overflow-x-auto pb-4 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-12 lg:px-12 2xl:-mx-16 2xl:px-16">
+                      <div className="flex gap-3 min-w-max">
                         {events.slice(0, 6).map(event => (
-                          <div key={event.id} className="w-[300px] md:w-[340px] flex-shrink-0">
+                          <div key={event.id} className="w-[240px] md:w-[260px] flex-shrink-0">
                             <EventCard
                               event={event}
                               onEventClick={handleEventClick}
@@ -152,13 +152,13 @@ const HomePage: React.FC<HomePageProps> = ({
 
             {/* We Think You'd Like Section */}
             {filteredEvents.length > 6 && (
-              <div className="mt-20 md:mt-24 bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-pink-50/50 border-y border-purple-100/50 py-16 md:py-20 -mx-4 px-4 md:-mx-8 md:px-8 lg:-mx-16 lg:px-16 2xl:-mx-20 2xl:px-20">
+              <div className="mt-8 md:mt-10 bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-pink-50/50 border-y border-purple-100/50 py-8 md:py-10 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-12 lg:px-12 2xl:-mx-16 2xl:px-16">
                 <div className="max-w-[1600px] mx-auto">
-                  <div className="mb-10 md:mb-12">
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight leading-tight">We think you'd like</h2>
-                    <p className="text-gray-600 text-base md:text-lg leading-relaxed tracking-wide">Personalized recommendations just for you</p>
+                  <div className="mb-6 md:mb-8">
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2 tracking-tight leading-tight">We think you'd like</h2>
+                    <p className="text-gray-600 text-sm md:text-base leading-relaxed tracking-wide">Personalized recommendations just for you</p>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                     {filteredEvents.slice(6, 10).map((event, index) => (
                       <div
                         key={event.id}
@@ -255,18 +255,18 @@ const HomePage: React.FC<HomePageProps> = ({
             )}
 
             {/* Browse All Section */}
-            <div className="mt-24 md:mt-28">
-              <div className="mb-12">
-                <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight leading-tight">
+            <div className="mt-8 md:mt-10">
+              <div className="mb-6">
+                <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2 tracking-tight leading-tight">
                   {showAllEvents ? 'All Events' : 'More Events'}
                 </h2>
-                <p className="text-gray-600 text-lg md:text-xl leading-relaxed tracking-wide">
+                <p className="text-gray-600 text-sm md:text-base leading-relaxed tracking-wide">
                   {showAllEvents ? `Showing all ${filteredEvents.length} events` : `Showing ${eventsToShow.length} of ${filteredEvents.length} events`}
                 </p>
               </div>
 
               {/* Event Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 md:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
                 {eventsToShow.map(event => (
                   <EventCard
                     key={event.id}

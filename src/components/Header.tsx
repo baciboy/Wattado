@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({ totalEvents, filters, onFiltersC
             </p>
           </div>
 
-          <div className="flex items-center gap-4 relative">
+          <div className="flex flex-wrap items-center gap-4 relative">
             <div className="bg-gradient-to-br from-blue-50 to-purple-50 px-5 py-3 rounded-2xl border border-blue-100/50 shadow-sm">
               <div className="flex items-center gap-2 text-blue-700">
                 <TrendingUp className="w-5 h-5" />

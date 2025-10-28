@@ -3,9 +3,12 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
 import AccountPage from "./pages/AccountPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { EventModal } from './components/EventModal';
 import { useState, useEffect } from 'react';
 import { Event, TicketmasterEvent, TicketmasterResponse, FilterState } from './types/Event';
+import { mockEvents } from './data/mockEvents';
 
 function App() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -183,9 +186,19 @@ function App() {
               : (e.times[0] || '')
           };
         });
-        setEvents(groupedEvents);
-      } catch {
-        setError('Failed to fetch events. Please try again later.');
+
+        // Always merge Ticketmaster events with mock events from other platforms
+        const nonTicketmasterMockEvents = mockEvents.filter(e => e.platform !== 'ticketmaster');
+        const allEvents = [...groupedEvents, ...nonTicketmasterMockEvents];
+        console.log(`Loaded ${groupedEvents.length} Ticketmaster events + ${nonTicketmasterMockEvents.length} mock events = ${allEvents.length} total`);
+        setEvents(allEvents);
+      } catch (err) {
+        console.error('Ticketmaster API error:', err);
+        console.log('Falling back to mock events only');
+        // Use mock events as fallback when Ticketmaster API fails
+        const nonTicketmasterMockEvents = mockEvents.filter(e => e.platform !== 'ticketmaster');
+        setEvents(nonTicketmasterMockEvents);
+        setError(null); // Clear error since we have fallback data
       } finally {
         setLoading(false);
       }
@@ -304,6 +317,8 @@ function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/account" element={<AccountPage />} />
         </Routes>
         <EventModal

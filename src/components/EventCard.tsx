@@ -69,7 +69,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onEventClick }) => 
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer group border border-gray-100 hover:border-blue-200 hover:-translate-y-1"
+      className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group border border-gray-100 hover:border-blue-200 hover:-translate-y-1"
       onClick={() => onEventClick(event)}
     >
       <div className="relative overflow-hidden">
@@ -77,7 +77,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onEventClick }) => 
         <img
           src={event.image}
           alt={event.title}
-          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute top-3 left-3 z-20">
           <span className={`${platformColors[event.platform]} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg`}>
@@ -102,62 +102,43 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onEventClick }) => 
         </div>
       </div>
 
-      <div className="p-5">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-semibold text-blue-700 bg-gradient-to-r from-blue-50 to-purple-50 px-3 py-1.5 rounded-full border border-blue-100">
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-xs font-semibold text-blue-700 bg-gradient-to-r from-blue-50 to-purple-50 px-2 py-0.5 rounded-full border border-blue-100">
             {event.category}
           </span>
           {event.rating && (
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <span className="text-sm font-medium text-gray-700">{event.rating}</span>
+            <div className="flex items-center gap-0.5">
+              <Star className="w-3 h-3 text-yellow-400 fill-current" />
+              <span className="text-xs font-medium text-gray-700">{event.rating}</span>
             </div>
           )}
         </div>
 
-        <h3 className="font-bold text-lg text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
+        <h3 className="font-bold text-sm text-gray-900 mb-1.5 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
           {event.title}
         </h3>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
-          {event.description}
-        </p>
-
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Calendar className="w-4 h-4 text-blue-600" />
-            <span>{formatDate(event.date)}{event.time ? ` at ${event.time}` : ''}</span>
+        <div className="space-y-1 mb-2">
+          <div className="flex items-center gap-1.5 text-xs text-gray-600">
+            <Calendar className="w-3 h-3 text-blue-600" />
+            <span className="line-clamp-1">{formatDate(event.date)}</span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <MapPin className="w-4 h-4 text-blue-600" />
-            <span>{event.location.venue}, {event.location.city}</span>
+          <div className="flex items-center gap-1.5 text-xs text-gray-600">
+            <MapPin className="w-3 h-3 text-blue-600" />
+            <span className="line-clamp-1">{event.location.city}</span>
           </div>
-
-          {event.attendees && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Users className="w-4 h-4 text-blue-600" />
-              <span>{event.attendees.toLocaleString()} attending</span>
-            </div>
-          )}
-
-          {event.genre && event.platform === 'ticketmaster' && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="w-4 h-4 text-blue-600">🎵</span>
-              <span>{event.genre}{event.subGenre ? ` • ${event.subGenre}` : ''}</span>
-            </div>
-          )}
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100 group-hover:border-blue-100">
-          <div className="text-xl font-extrabold bg-gradient-to-r from-blue-700 to-purple-600 bg-clip-text text-transparent">
+        <div className="flex items-center justify-between pt-2 border-t border-gray-100 group-hover:border-blue-100">
+          <div className="text-sm font-extrabold bg-gradient-to-r from-blue-700 to-purple-600 bg-clip-text text-transparent">
             {event.price
               ? formatPrice(event.price.min, event.price.max, event.price.currency)
-              : 'Price not available'}
+              : 'Free'}
           </div>
-          <div className="flex items-center gap-1.5 text-blue-700 font-semibold text-sm group-hover:text-blue-800 group-hover:gap-2 transition-all">
-            <span>View Details</span>
-            <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          <div className="flex items-center gap-0.5 text-blue-700 font-semibold text-xs group-hover:text-blue-800 transition-all">
+            <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </div>
         </div>
       </div>

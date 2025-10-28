@@ -3,12 +3,16 @@
 ## Executive Summary
 EventFinder is an event discovery platform that aggregates events from multiple sources (Ticketmaster, Eventbrite, etc.) with AI-powered personalization and social features. Users can browse events without authentication, create accounts when they want to save favorites, and get personalized recommendations through AI chatbot integration.
 
-## Current State
+## Current State (Updated: 2025-10-28)
 - ✅ Ticketmaster API integration
 - ✅ Event browsing and filtering
 - ✅ Responsive UI with Tailwind CSS
 - ✅ Event detail modals
 - ✅ Platform-specific styling
+- ✅ Email/password authentication with Supabase
+- ✅ Favorites system with Supabase backend
+- ✅ **AI-powered natural language search with AWS Bedrock + Claude 3.5 Sonnet**
+- ✅ Mock events dataset (30 diverse events for testing)
 
 ## Phase 1: Core User Management & Favorites
 
@@ -281,27 +285,59 @@ CREATE TABLE group_members (
 
 ### 7. AI Chatbot & Recommendations
 
-#### User Stories
-- **US7.1**: As a user, I can chat with an AI assistant to find events
-- **US7.2**: As a user, I can use natural language to search ("Find me concerts this weekend under $50")
+#### Implementation Status
+- ✅ **US7.2 IMPLEMENTED**: Natural language search with AWS Bedrock + Claude 3.5 Sonnet
+  - Parses queries like "romantic date night under $50"
+  - Extracts category, location, dateRange, priceRange, keywords, and mood
+  - Time reference parsing ("this weekend", "tonight", "next week")
+  - Mood-based event ranking (romantic, stylish, fun, cultural, energetic, relaxing, family, elegant)
+  - User-friendly query explanations
+  - Graceful fallback to regular search
+
+#### Remaining User Stories
+- **US7.1**: As a user, I can chat with an AI assistant to find events (chatbot widget UI)
 - **US7.3**: As a user, I get personalized event recommendations based on my preferences
 - **US7.4**: As a user, I see an AI recommendations section on the homepage
 
-#### UI Components Needed
-1. **AI Chat Widget** (`src/components/ai/ChatWidget.tsx`)
+#### UI Components Status
+1. **AI Chat Widget** (`src/components/ai/ChatWidget.tsx`) - ❌ NOT IMPLEMENTED
    - Floating chat button
    - Chat interface with message history
    - Quick action suggestions
 
-2. **Recommendations Section** (`src/components/ai/RecommendationsSection.tsx`)
+2. **Recommendations Section** (`src/components/ai/RecommendationsSection.tsx`) - ❌ NOT IMPLEMENTED
    - Personalized event suggestions
    - "Why we recommend this" explanations
 
-3. **Natural Language Search** (enhance existing search)
-   - AI-powered query parsing
-   - Smart filters based on intent
+3. **Natural Language Search** - ✅ **IMPLEMENTED** (in `src/components/Header.tsx`)
+   - ✅ AI-powered query parsing via `src/services/aiService.ts`
+   - ✅ Backend API at `api/ai/search.ts` using AWS Bedrock
+   - ✅ Smart filters based on intent
+   - ✅ Auto-detects natural language queries (3+ words)
+   - ✅ Shows "AI thinking..." spinner
+   - ✅ Displays query explanation to user
 
 #### AI Integration
+
+**Implemented** (`src/services/aiService.ts` & `api/ai/search.ts`):
+```typescript
+interface AISearchParams {
+  category?: string;
+  location?: string;
+  dateRange?: { start: string; end: string };
+  priceRange?: { min: number; max: number };
+  keywords?: string[];
+  mood?: string;
+}
+
+interface AISearchResult {
+  success: boolean;
+  searchParams: AISearchParams;
+  explanation: string;
+}
+```
+
+**To Be Implemented**:
 ```typescript
 interface AIRecommendation {
   event: Event;
@@ -320,6 +356,12 @@ interface ChatMessage {
   createdAt: Date;
 }
 ```
+
+**Technology Stack**:
+- AWS Bedrock with Claude 3.5 Sonnet (primary model)
+- Claude 3.5 Haiku (fallback for faster/cheaper queries)
+- Vercel AI SDK (`@ai-sdk/amazon-bedrock`, `ai`)
+- Deployed via Vercel Serverless Functions
 
 ## Phase 4: Analytics & Tracking
 
@@ -356,59 +398,80 @@ CREATE INDEX idx_analytics_events_created_at ON analytics_events(created_at);
 
 ## Implementation Priority
 
-### Sprint 1 (Week 1-2): Core Authentication
-- [ ] Authentication modals and flows
-- [ ] User registration with preferences
-- [ ] Basic user menu in header
-- [ ] Supabase auth setup
+### Sprint 1 (Week 1-2): Core Authentication - ✅ COMPLETE
+- [x] Authentication modals and flows
+- [x] User registration with preferences
+- [x] Basic user menu in header
+- [x] Supabase auth setup
 
-### Sprint 2 (Week 3-4): Favorites System
-- [ ] Heart buttons on event cards
-- [ ] Favorites page
-- [ ] Basic list management
-- [ ] Auth prompts for favorites
+### Sprint 2 (Week 3-4): Favorites System - ✅ COMPLETE
+- [x] Heart buttons on event cards
+- [x] Favorites page
+- [x] Supabase favorites table integration
+- [ ] Custom list management (in progress)
 
-### Sprint 3 (Week 5-6): Event Deduplication & UX
-- [ ] Event grouping logic
-- [ ] Enhanced event cards with date ranges
-- [ ] Multi-date selection for favorites
-- [ ] Improved filtering
+### Sprint 3 (Week 5-6): Event Deduplication & UX - ✅ COMPLETE
+- [x] Event grouping logic
+- [x] Enhanced event cards with date ranges
+- [x] Improved filtering
+- [x] Mock events dataset (30 events)
 
-### Sprint 4 (Week 7-8): Social Sharing
+### Sprint 4 (Week 7-8): Social Sharing - ❌ NOT STARTED
 - [ ] Share buttons and modals
 - [ ] WhatsApp integration
 - [ ] Social media sharing
 - [ ] Copy link functionality
 
-### Sprint 5 (Week 9-10): Friends & Groups
+### Sprint 5 (Week 9-10): Friends & Groups - ❌ NOT STARTED
 - [ ] Friend system implementation
 - [ ] Group creation and management
 - [ ] Event invitations
 
-### Sprint 6 (Week 11-12): AI Integration
-- [ ] Basic chatbot interface
+### Sprint 6 (Week 11-12): AI Integration - 🟡 PARTIALLY COMPLETE
+- [x] **Natural language search** (AWS Bedrock + Claude 3.5 Sonnet)
+- [x] AI query parsing with mood, time, price extraction
+- [x] Event ranking based on AI parameters
+- [ ] Chatbot widget UI
 - [ ] Recommendation engine
-- [ ] Natural language search
+- [ ] Personalized suggestions section
 
 ## Technical Implementation Notes
 
 ### Environment Variables Needed
 ```bash
+# Ticketmaster API
+VITE_TICKETMASTER_API_KEY=your_ticketmaster_api_key
+
 # Supabase
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# Social Auth
+# Social Auth (not yet implemented)
 VITE_FACEBOOK_APP_ID=your_facebook_app_id
 
-# AI Integration (future)
-VITE_OPENAI_API_KEY=your_openai_key
+# AI Integration - AWS Bedrock (IMPLEMENTED - server-side only, no VITE_ prefix)
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_REGION=us-east-1
+BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20240620-v1:0
+BEDROCK_FAST_MODEL_ID=anthropic.claude-3-haiku-20240307-v1:0
 ```
 
-### Key Dependencies to Add
+### Key Dependencies
+**Already Installed**:
 ```json
 {
   "@supabase/supabase-js": "^2.57.4",
+  "@ai-sdk/amazon-bedrock": "^1.0.8",
+  "ai": "^4.0.0",
+  "react-router-dom": "^7.0.2",
+  "lucide-react": "^0.468.0"
+}
+```
+
+**To Add for Future Features**:
+```json
+{
   "react-hook-form": "^7.48.2",
   "zod": "^3.22.4",
   "react-query": "^3.39.3",
@@ -417,57 +480,89 @@ VITE_OPENAI_API_KEY=your_openai_key
 }
 ```
 
-### File Structure Updates
+### File Structure (Current + Planned)
+
+**Current Implementation**:
+```
+src/
+├── components/
+│   ├── header/
+│   │   └── UserMenu.tsx ✅
+│   ├── EventCard.tsx ✅
+│   ├── EventModal.tsx ✅
+│   ├── FilterSidebar.tsx ✅
+│   └── Header.tsx ✅ (with AI search integration)
+├── pages/
+│   ├── HomePage.tsx ✅
+│   ├── LoginPage.tsx ✅
+│   ├── SignupPage.tsx ✅
+│   ├── FavouritesPage.tsx ✅
+│   └── UserAccountPage.tsx ✅
+├── services/
+│   ├── supabaseClient.ts ✅
+│   ├── ticketmasterService.ts ✅
+│   └── aiService.ts ✅ (AI query parsing & event ranking)
+├── hooks/
+│   ├── useAuth.ts ✅
+│   └── useEventFilters.ts ✅
+├── types/
+│   └── Event.ts ✅
+└── data/
+    └── mockEvents.ts ✅ (30 diverse test events)
+api/
+└── ai/
+    └── search.ts ✅ (AWS Bedrock serverless function)
+```
+
+**To Be Added**:
 ```
 src/
 ├── components/
 │   ├── auth/
-│   │   ├── LoginModal.tsx
-│   │   ├── SignupModal.tsx
-│   │   └── AuthPromptModal.tsx
+│   │   └── AuthPromptModal.tsx ❌
 │   ├── events/
-│   │   ├── HeartButton.tsx
-│   │   └── ShareButton.tsx
+│   │   └── ShareButton.tsx ❌
 │   ├── favorites/
-│   │   ├── FavoritesList.tsx
-│   │   └── ListManager.tsx
-│   ├── header/
-│   │   └── UserMenu.tsx
+│   │   └── ListManager.tsx ❌
 │   └── ai/
-│       ├── ChatWidget.tsx
-│       └── RecommendationsSection.tsx
-├── pages/
-│   ├── FavoritesPage.tsx
-│   └── ProfilePage.tsx
+│       ├── ChatWidget.tsx ❌
+│       └── RecommendationsSection.tsx ❌
 ├── services/
-│   ├── supabaseService.ts
-│   ├── authService.ts
-│   ├── favoritesService.ts
-│   └── analyticsService.ts
-├── hooks/
-│   ├── useAuth.ts
-│   ├── useFavorites.ts
-│   └── useAnalytics.ts
-└── types/
-    ├── Auth.ts
-    ├── Favorites.ts
-    └── Analytics.ts
+│   ├── favoritesService.ts ❌ (for custom lists)
+│   └── analyticsService.ts ❌
+└── hooks/
+    ├── useFavorites.ts ❌
+    └── useAnalytics.ts ❌
 ```
 
 ## Acceptance Criteria
 
 ### Authentication
-- [ ] Users can browse without authentication
+- [x] Users can browse without authentication
+- [x] User account system with Supabase
+- [x] Email/password authentication works
 - [ ] Favorite prompt triggers auth flow
-- [ ] All auth methods work (email, phone, Facebook)
-- [ ] User preferences saved during signup
-- [ ] Persistent login sessions
+- [ ] Phone authentication (UI exists but not implemented)
+- [ ] Facebook OAuth (button exists but not connected)
+- [x] Persistent login sessions
 
 ### Favorites
-- [ ] Heart animation works smoothly
-- [ ] Favorites persist across sessions
-- [ ] Multiple lists can be created and managed
-- [ ] Events can be added/removed from lists
+- [x] Heart buttons on event cards
+- [x] Favorites persist across sessions via Supabase
+- [x] Favorites page displays saved events
+- [ ] Multiple custom lists can be created and managed
+- [x] Events can be added/removed from favorites
+
+### AI Natural Language Search
+- [x] Natural language queries are auto-detected (3+ words)
+- [x] AI parses queries for category, location, date, price, mood
+- [x] Time references work ("this weekend", "tonight", "next week")
+- [x] Mood-based event ranking (romantic, stylish, fun, etc.)
+- [x] User-friendly query explanations displayed
+- [x] Graceful fallback to regular search if AI fails
+- [x] AWS Bedrock integration with Claude 3.5 Sonnet
+- [ ] Chatbot widget for conversational search
+- [ ] Personalized recommendations based on user preferences
 
 ### Event Deduplication
 - [ ] Multi-date events show as single card

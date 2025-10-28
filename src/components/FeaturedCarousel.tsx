@@ -98,11 +98,11 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
   const rightEvent = featuredEvents[getNextIndex()];
 
   return (
-    <div className="relative w-full mb-20 md:mb-24">
+    <div className="relative w-full mb-10 md:mb-12">
       {/* Main Container: Intro + Carousel */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch">
-        {/* Left Side: Introduction (1/4) */}
-        <div className="lg:w-1/4 flex flex-col justify-center px-4 lg:px-8">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-stretch">
+        {/* Left Side: Introduction (1/3) */}
+        <div className="lg:w-1/3 flex flex-col justify-center px-4 lg:px-6">
           <div className="space-y-8">
             <div>
               <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-5 leading-tight tracking-tight">
@@ -144,37 +144,48 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
           </div>
         </div>
 
-        {/* Right Side: 3D Carousel (3/4) */}
-        <div className="lg:w-3/4 relative h-[450px] md:h-[520px] flex items-center justify-center px-4 md:px-8">
-        {/* Left Card */}
+        {/* Right Side: 3D Carousel (2/3) */}
+        <div className="lg:w-2/3 relative h-[320px] md:h-[380px] flex items-center justify-center overflow-hidden">
+        {/* Left Card - Peeking out ~30% */}
         <div
-          className="absolute left-[15%] md:left-[20%] top-1/2 -translate-y-1/2 w-[300px] md:w-[420px] cursor-pointer transform scale-75 md:scale-85 opacity-40 hover:opacity-60 transition-all duration-500 z-10"
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[70%] w-[240px] md:w-[340px] cursor-pointer transform scale-85 md:scale-90 hover:scale-90 md:hover:scale-95 opacity-50 hover:opacity-70 transition-all duration-500 z-10 hover:-translate-x-[65%]"
           onClick={goToPrevious}
         >
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 border border-purple-100/50">
+          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-[0_20px_60px_-10px_rgba(139,92,246,0.4)] transition-all duration-300 border-2 border-purple-200/50 rotate-[-2deg] hover:rotate-[-1deg]">
             <div className="relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 via-transparent to-transparent z-10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/50 via-purple-900/20 to-transparent z-10" />
               <img
                 src={leftEvent.image}
                 alt={leftEvent.title}
-                className="w-full h-40 md:h-48 object-cover"
+                className="w-full h-32 md:h-40 object-cover"
               />
               <div className="absolute top-3 left-3 z-20">
-                <span className={`${platformColors[leftEvent.platform]} text-white text-xs font-semibold px-2 py-1 rounded-full`}>
+                <span className={`${platformColors[leftEvent.platform]} text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow-md`}>
                   {platformNames[leftEvent.platform]}
                 </span>
               </div>
+              {leftEvent.rating && (
+                <div className="absolute top-3 right-3 z-20 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 border border-yellow-200/50">
+                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                  <span className="text-xs font-bold text-gray-900">{leftEvent.rating}</span>
+                </div>
+              )}
             </div>
             <div className="p-3 md:p-4">
-              <span className="text-xs font-medium text-purple-700 bg-gradient-to-r from-purple-50 to-pink-50 px-2 py-1 rounded-full border border-purple-100">
+              <span className="text-xs font-semibold text-purple-700 bg-gradient-to-r from-purple-50 to-pink-50 px-2 py-0.5 rounded-full border border-purple-100">
                 {leftEvent.category}
               </span>
-              <h3 className="font-bold text-base md:text-lg text-gray-900 mt-2 line-clamp-1">
+              <h3 className="font-bold text-sm md:text-base text-gray-900 mt-2 line-clamp-2">
                 {leftEvent.title}
               </h3>
-              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 mt-2">
-                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
-                <span>{formatDate(leftEvent.date)}</span>
+              <div className="flex items-center gap-2 text-xs text-gray-600 mt-2">
+                <Calendar className="w-3 h-3 text-purple-600" />
+                <span className="line-clamp-1">{formatDate(leftEvent.date)}</span>
+              </div>
+              <div className="mt-2 pt-2 border-t border-purple-100">
+                <div className="text-sm md:text-base font-bold text-purple-700">
+                  {formatPrice(leftEvent.price.min, leftEvent.price.max, leftEvent.price.currency)}
+                </div>
               </div>
             </div>
           </div>
@@ -182,16 +193,16 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
 
         {/* Center Card (Main) */}
         <div
-          className="relative w-[380px] md:w-[600px] cursor-pointer transform scale-100 z-30 hover:scale-[1.02] transition-all duration-500"
+          className="relative w-[300px] md:w-[440px] cursor-pointer transform scale-100 z-30 hover:scale-[1.02] transition-all duration-500"
           onClick={() => onEventClick(centerEvent)}
         >
-          <div className="bg-white rounded-3xl shadow-[0_25px_80px_-20px_rgba(0,0,0,0.4)] overflow-hidden hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.5)] transition-all duration-300 border-2 border-gradient-to-r from-blue-200/50 via-purple-200/50 to-pink-200/50">
+          <div className="bg-white rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] overflow-hidden hover:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.5)] transition-all duration-300 border-2 border-gradient-to-r from-blue-200/50 via-purple-200/50 to-pink-200/50">
             <div className="relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 via-purple-900/20 to-transparent z-10" />
               <img
                 src={centerEvent.image}
                 alt={centerEvent.title}
-                className="w-full h-52 md:h-72 object-cover"
+                className="w-full h-36 md:h-48 object-cover"
               />
               <div className="absolute top-4 left-4 z-20">
                 <span className={`${platformColors[centerEvent.platform]} text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg`}>
@@ -219,77 +230,88 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
               </div>
             </div>
 
-            <div className="p-5 md:p-6">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-blue-700 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 px-3 py-1.5 rounded-full border border-blue-100">
+            <div className="p-4 md:p-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold text-blue-700 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 px-2.5 py-1 rounded-full border border-blue-100">
                   {centerEvent.category}
                 </span>
               </div>
 
-              <h3 className="font-bold text-xl md:text-2xl text-gray-900 mb-2 leading-tight line-clamp-2">
+              <h3 className="font-bold text-lg md:text-xl text-gray-900 mb-2 leading-tight line-clamp-2">
                 {centerEvent.title}
               </h3>
 
-              <p className="text-gray-600 text-sm md:text-base mb-4 line-clamp-2">
+              <p className="text-gray-600 text-xs md:text-sm mb-3 line-clamp-2">
                 {centerEvent.description}
               </p>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-sm md:text-base text-gray-700">
-                  <Calendar className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                  <span className="font-medium">{formatDate(centerEvent.date)}{centerEvent.time ? ` at ${centerEvent.time}` : ''}</span>
+              <div className="space-y-1.5 mb-3">
+                <div className="flex items-center gap-2 text-xs md:text-sm text-gray-700">
+                  <Calendar className="w-4 h-4 text-blue-600" />
+                  <span className="font-medium line-clamp-1">{formatDate(centerEvent.date)}{centerEvent.time ? ` at ${centerEvent.time}` : ''}</span>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm md:text-base text-gray-700">
-                  <MapPin className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+                <div className="flex items-center gap-2 text-xs md:text-sm text-gray-700">
+                  <MapPin className="w-4 h-4 text-blue-600" />
                   <span className="font-medium line-clamp-1">{centerEvent.location.venue}, {centerEvent.location.city}</span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <div className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                <div className="text-lg md:text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                   {centerEvent.price
                     ? formatPrice(centerEvent.price.min, centerEvent.price.max, centerEvent.price.currency)
                     : 'Free'}
                 </div>
-                <div className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full font-semibold text-sm md:text-base hover:shadow-lg transition-all">
+                <div className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1.5 rounded-full font-semibold text-xs md:text-sm hover:shadow-lg transition-all">
                   <span>View Details</span>
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="w-3 h-3" />
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Card */}
+        {/* Right Card - Peeking out ~30% */}
         <div
-          className="absolute right-[15%] md:right-[20%] top-1/2 -translate-y-1/2 w-[300px] md:w-[420px] cursor-pointer transform scale-75 md:scale-85 opacity-40 hover:opacity-60 transition-all duration-500 z-10"
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[70%] w-[240px] md:w-[340px] cursor-pointer transform scale-85 md:scale-90 hover:scale-90 md:hover:scale-95 opacity-50 hover:opacity-70 transition-all duration-500 z-10 hover:translate-x-[65%]"
           onClick={goToNext}
         >
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 border border-teal-100/50">
+          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-[0_20px_60px_-10px_rgba(20,184,166,0.4)] transition-all duration-300 border-2 border-teal-200/50 rotate-[2deg] hover:rotate-[1deg]">
             <div className="relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-teal-900/30 via-transparent to-transparent z-10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-teal-900/50 via-teal-900/20 to-transparent z-10" />
               <img
                 src={rightEvent.image}
                 alt={rightEvent.title}
-                className="w-full h-40 md:h-48 object-cover"
+                className="w-full h-32 md:h-40 object-cover"
               />
               <div className="absolute top-3 left-3 z-20">
-                <span className={`${platformColors[rightEvent.platform]} text-white text-xs font-semibold px-2 py-1 rounded-full`}>
+                <span className={`${platformColors[rightEvent.platform]} text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow-md`}>
                   {platformNames[rightEvent.platform]}
                 </span>
               </div>
+              {rightEvent.rating && (
+                <div className="absolute top-3 right-3 z-20 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 border border-yellow-200/50">
+                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                  <span className="text-xs font-bold text-gray-900">{rightEvent.rating}</span>
+                </div>
+              )}
             </div>
             <div className="p-3 md:p-4">
-              <span className="text-xs font-medium text-teal-700 bg-gradient-to-r from-teal-50 to-cyan-50 px-2 py-1 rounded-full border border-teal-100">
+              <span className="text-xs font-semibold text-teal-700 bg-gradient-to-r from-teal-50 to-cyan-50 px-2 py-0.5 rounded-full border border-teal-100">
                 {rightEvent.category}
               </span>
-              <h3 className="font-bold text-base md:text-lg text-gray-900 mt-2 line-clamp-1">
+              <h3 className="font-bold text-sm md:text-base text-gray-900 mt-2 line-clamp-2">
                 {rightEvent.title}
               </h3>
-              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 mt-2">
-                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
-                <span>{formatDate(rightEvent.date)}</span>
+              <div className="flex items-center gap-2 text-xs text-gray-600 mt-2">
+                <Calendar className="w-3 h-3 text-teal-600" />
+                <span className="line-clamp-1">{formatDate(rightEvent.date)}</span>
+              </div>
+              <div className="mt-2 pt-2 border-t border-teal-100">
+                <div className="text-sm md:text-base font-bold text-teal-700">
+                  {formatPrice(rightEvent.price.min, rightEvent.price.max, rightEvent.price.currency)}
+                </div>
               </div>
             </div>
           </div>
@@ -300,14 +322,14 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
           <>
             <button
               onClick={goToPrevious}
-              className="absolute left-0 md:-left-4 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-white hover:bg-blue-50 text-blue-700 rounded-full transition-all shadow-lg hover:shadow-xl z-30 hover:scale-110"
+              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full transition-all shadow-xl hover:shadow-2xl z-40 hover:scale-110 border-2 border-white/20"
               aria-label="Previous event"
             >
               <ChevronLeft className="w-6 h-6 md:w-7 md:h-7" />
             </button>
             <button
               onClick={goToNext}
-              className="absolute right-0 md:-right-4 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-white hover:bg-blue-50 text-blue-700 rounded-full transition-all shadow-lg hover:shadow-xl z-30 hover:scale-110"
+              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-full transition-all shadow-xl hover:shadow-2xl z-40 hover:scale-110 border-2 border-white/20"
               aria-label="Next event"
             >
               <ChevronRight className="w-6 h-6 md:w-7 md:h-7" />
@@ -317,15 +339,15 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ events, onEv
 
         {/* Dots Navigation */}
         {featuredEvents.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-2 z-20">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-2.5 z-40 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-gray-200/50">
             {featuredEvents.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
                 className={`transition-all ${
                   index === currentIndex
-                    ? 'w-10 h-2.5 bg-blue-700'
-                    : 'w-2.5 h-2.5 bg-gray-300 hover:bg-gray-400'
+                    ? 'w-10 h-3 bg-gradient-to-r from-blue-600 to-purple-600 shadow-md'
+                    : 'w-3 h-3 bg-gray-300 hover:bg-gray-400 hover:scale-110'
                 } rounded-full`}
                 aria-label={`Go to slide ${index + 1}`}
               />
