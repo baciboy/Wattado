@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
@@ -6,6 +6,7 @@ import AccountPage from "./pages/AccountPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { EventModal } from './components/EventModal';
+import { ChatBot } from './components/ChatBot';
 import { useState, useEffect } from 'react';
 import { Event, TicketmasterEvent, TicketmasterResponse, FilterState } from './types/Event';
 import { mockEvents } from './data/mockEvents';
@@ -303,32 +304,69 @@ function App() {
   return (
     <div className="h-full">
       <Router basename={import.meta.env.BASE_URL}>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <HomePage
-                filteredEvents={filteredEvents}
-                filters={filters}
-                onFiltersChange={setFilters}
-                handleEventClick={handleEventClick}
-              />
-            }
-          />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/account" element={<AccountPage />} />
-        </Routes>
-        <EventModal
-          event={selectedEvent}
-          isOpen={isModalOpen}
-          onClose={closeModal}
+        <AppContent
+          filteredEvents={filteredEvents}
+          filters={filters}
+          setFilters={setFilters}
+          handleEventClick={handleEventClick}
+          selectedEvent={selectedEvent}
+          isModalOpen={isModalOpen}
+          closeModal={closeModal}
+          events={events}
         />
       </Router>
     </div>
   );
 }
+
+// Inner component to access useLocation
+const AppContent: React.FC<{
+  filteredEvents: Event[];
+  filters: FilterState;
+  setFilters: (filters: FilterState) => void;
+  handleEventClick: (event: Event) => void;
+  selectedEvent: Event | null;
+  isModalOpen: boolean;
+  closeModal: () => void;
+  events: Event[];
+}> = ({ filteredEvents, filters, setFilters, handleEventClick, selectedEvent, isModalOpen, closeModal, events }) => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/' || location.pathname === '';
+
+  return (
+    <>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              filteredEvents={filteredEvents}
+              filters={filters}
+              onFiltersChange={setFilters}
+              handleEventClick={handleEventClick}
+            />
+          }
+        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/account" element={<AccountPage />} />
+      </Routes>
+      <EventModal
+        event={selectedEvent}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
+      {/* Show ChatBot only on home page */}
+      {isHomePage && (
+        <ChatBot
+          events={events}
+          onEventClick={handleEventClick}
+        />
+      )}
+    </>
+  );
+};
 
 export default App;

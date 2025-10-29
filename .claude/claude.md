@@ -25,17 +25,20 @@ src/
 │   ├── EventCard.tsx    # Event card display
 │   ├── EventModal.tsx   # Event details modal
 │   ├── FilterSidebar.tsx # Event filtering sidebar
-│   └── Header.tsx       # Main header component with AI search
+│   ├── Header.tsx       # Main header component with AI search
+│   └── ChatBot.tsx      # AI chatbot widget for conversations
 ├── pages/               # Page-level components
 │   ├── HomePage.tsx     # Main event listing page
 │   ├── LoginPage.tsx    # User login page
-│   └── SignupPage.tsx   # User registration page
+│   ├── SignupPage.tsx   # User registration page
+│   └── AccountPage.tsx  # User account and settings
 ├── services/            # External service integrations
 │   ├── supabaseClient.ts      # Supabase client setup
 │   ├── ticketmasterService.ts # Ticketmaster API integration
 │   └── aiService.ts           # AI query parsing and event ranking
 ├── hooks/               # Custom React hooks
 │   ├── useAuth.ts       # Authentication hook
+│   ├── useFavourites.ts # Favourites management hook
 │   └── useEventFilters.ts # Event filtering logic
 ├── types/               # TypeScript type definitions
 │   └── Event.ts         # Event-related types
@@ -45,7 +48,8 @@ src/
 └── main.tsx            # App entry point
 api/
 └── ai/
-    └── search.ts        # Serverless function for AI query parsing
+    ├── search.ts        # Serverless function for AI query parsing
+    └── chat.ts          # Serverless function for chatbot conversations
 ```
 
 ## Environment Variables
@@ -82,13 +86,15 @@ BEDROCK_FAST_MODEL_ID=anthropic.claude-3-haiku-20240307-v1:0
 - ✅ Event detail modals
 - ✅ Platform-specific styling
 - ✅ Email/password authentication with Supabase
-- ✅ User menu with login/logout
+- ✅ User menu with login/logout and account management
+- ✅ User password change functionality
 - ✅ React Router navigation
 - ✅ **AI-powered natural language search with AWS Bedrock + Claude 3.5 Sonnet**
+- ✅ **AI conversational chatbot for event recommendations**
 - ✅ Favorites system with Supabase integration
 - ✅ Mock events dataset (30 diverse events for testing)
 
-### AI Query Features (Phase 4 - Partially Implemented)
+### AI Features (Phase 4 - Implemented)
 - ✅ Natural language query parsing ("romantic date night under $50")
 - ✅ Mood-based event ranking (romantic, stylish, fun, cultural, energetic, relaxing, family, elegant)
 - ✅ Time reference parsing ("this weekend", "tonight", "next week")
@@ -96,6 +102,10 @@ BEDROCK_FAST_MODEL_ID=anthropic.claude-3-haiku-20240307-v1:0
 - ✅ Category inference from context
 - ✅ User-friendly query explanations
 - ✅ Graceful fallback to regular search
+- ✅ **Conversational chatbot widget with persistent history**
+- ✅ **Context-aware event recommendations in chat**
+- ✅ **Clickable event cards within chat interface**
+- ✅ **Multi-turn conversations with memory**
 
 ### Planned Features (from PRD)
 - Phase 2: Custom event lists and list management
@@ -147,6 +157,48 @@ Events from Ticketmaster are grouped by name and venue to prevent duplicate card
 - **relaxing**: relaxing, peaceful, calm, mindfulness, wellness
 - **family**: family, kids, children, family-friendly
 - **elegant**: elegant, gala, formal, upscale, luxury
+
+### AI Chatbot System
+**Architecture**: User Message → ChatBot Component → Backend API → AWS Bedrock (Claude) → Response + Event IDs → Display Events
+
+**Components**:
+1. **Frontend Component** (`src/components/ChatBot.tsx`)
+   - Floating chat bubble widget (bottom-right corner)
+   - Expandable chat window with conversation history
+   - Message interface: user messages, AI responses, event cards
+   - Manages conversation state and history
+   - Clickable event cards integrated with event modal
+
+2. **Backend API** (`api/ai/chat.ts`)
+   - Serverless function using AWS Bedrock + Claude 3.5 Sonnet
+   - Receives: user message, conversation history, available events context
+   - Sends top 30 events to Claude for context
+   - Parses Claude's response for event recommendations
+   - Extracts event IDs using `[EVENT_IDS: id1, id2, id3]` format
+   - Returns: cleaned message + array of recommended event IDs
+
+3. **Integration** (`App.tsx`)
+   - ChatBot only appears on home page
+   - Receives full events list for context
+   - Uses existing handleEventClick for modal integration
+   - Location-aware rendering with useLocation hook
+
+**System Prompt Instructions**:
+- Be conversational, friendly, and enthusiastic
+- Ask clarifying questions when needed
+- Recommend events with specific details (date, location, price)
+- Include event IDs using `[EVENT_IDS: ...]` format
+- Consider mood, budget, date preferences, and location
+- Explain WHY recommending specific events
+- Guide users to discover events from available list
+
+**Example Usage**:
+- "Find romantic date night events under £50"
+- "What's happening this weekend in London?"
+- "Show me fun concerts"
+- "I'm bored, surprise me with something cultural"
+
+**Documentation**: See `docs/CHATBOT.md` for full guide and `docs/CHATBOT_QUICK_START.md` for quick reference
 
 ### Environment Variable Validation
 - Development mode warnings for missing API keys
@@ -221,20 +273,21 @@ npm run preview
 3. **Custom event lists**: Favorites work but custom list management not implemented yet
 4. **Past events**: Filtered out by default (startDateTime set to now)
 5. **UK-focused**: Default country code is GB, cities list is UK cities
-6. **AI chatbot widget**: Natural language search works, but interactive chatbot UI not yet implemented
-7. **Mock events**: Using 30 test events until full API integrations are ready
+6. **Mock events**: Using 30 test events until full API integrations are ready
+7. **Chatbot user preferences**: Conversations not persisted to database yet (resets on page reload)
 
 ## Future Development Priorities
 
 According to the PRD (`eventfinder_prd.md`):
 1. ✅ ~~Complete favorites system with Supabase backend~~ (DONE)
 2. ✅ ~~Build natural language event search~~ (DONE)
-3. Custom event lists management UI
-4. AI chatbot widget with conversation history
-5. AI-powered recommendations section
-6. Social sharing features (WhatsApp, social media)
-7. Friends and group planning features
-8. Analytics tracking system
+3. ✅ ~~AI chatbot widget with conversation history~~ (DONE)
+4. Persist chatbot conversations to database
+5. Custom event lists management UI
+6. AI-powered recommendations section on home page
+7. Social sharing features (WhatsApp, social media)
+8. Friends and group planning features
+9. Analytics tracking system
 
 ## Testing Considerations
 
